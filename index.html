@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Spectro Report">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#991B1B">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <title>דוח שירות - ספקטרו ישראל Cam</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2001,6 +2008,15 @@ document.addEventListener('DOMContentLoaded',function(){
     cvs.addEventListener('touchend',saveFormData);
   });
 });
+
+// ═══════════════════════════════════════════
+// PWA: Register Service Worker
+// ═══════════════════════════════════════════
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(function(e){
+    console.log('SW registration skipped:',e);
+  });
+}
 </script>
 </body>
 </html>
