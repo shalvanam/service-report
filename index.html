@@ -324,22 +324,28 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
     <h3 class="menu-header" onclick="toggleSection(this)" id="menuPathTitle">תיקיית שמירה <span class="arrow">▾</span></h3>
     <div class="menu-body" style="display:none">
       <div class="config-section">
-        <label id="pathLabel">בחר תיקייה לשמירת קבצי PDF</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="cbtn" onclick="chooseSavePath()" id="pathBtn" style="width:auto;flex-shrink:0">📂 <span data-t="choosePath">בחר תיקייה</span></button>
+        <div id="folderPickerSupported">
+          <label id="pathLabel">בחר תיקייה לשמירת קבצי PDF</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="cbtn" onclick="chooseSavePath()" id="pathBtn" style="width:auto;flex-shrink:0">📂 <span data-t="choosePath">בחר תיקייה</span></button>
+          </div>
+          <div id="pathDisplay" style="margin-top:8px;font-size:11px;color:var(--s5);word-break:break-all;display:none">
+            <span>📁 </span><span id="pathName"></span>
+            <button onclick="clearSavePath()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;margin-right:8px">✕</button>
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--s2)"></div>
+          <label id="jsonPathLabel">בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+            <button class="cbtn" onclick="chooseJsonPath()" id="jsonPathBtn" style="width:auto;flex-shrink:0">📂 <span data-t="chooseJsonPath">בחר תיקייה</span></button>
+          </div>
+          <div id="jsonPathDisplay" style="margin-top:8px;font-size:11px;color:var(--s5);word-break:break-all;display:none">
+            <span>📁 </span><span id="jsonPathName"></span>
+            <button onclick="clearJsonPath()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;margin-right:8px">✕</button>
+          </div>
         </div>
-        <div id="pathDisplay" style="margin-top:8px;font-size:11px;color:var(--s5);word-break:break-all;display:none">
-          <span>📁 </span><span id="pathName"></span>
-          <button onclick="clearSavePath()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;margin-right:8px">✕</button>
-        </div>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--s2)"></div>
-        <label id="jsonPathLabel">בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)</label>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
-          <button class="cbtn" onclick="chooseJsonPath()" id="jsonPathBtn" style="width:auto;flex-shrink:0">📂 <span data-t="chooseJsonPath">בחר תיקייה</span></button>
-        </div>
-        <div id="jsonPathDisplay" style="margin-top:8px;font-size:11px;color:var(--s5);word-break:break-all;display:none">
-          <span>📁 </span><span id="jsonPathName"></span>
-          <button onclick="clearJsonPath()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;margin-right:8px">✕</button>
+        <div id="folderPickerUnsupported" style="display:none;text-align:center;padding:10px 0">
+          <div style="font-size:28px;margin-bottom:8px">📥</div>
+          <div id="unsupportedMsg" style="font-size:13px;color:var(--s5);line-height:1.6">הקבצים יישמרו אוטומטית בתיקיית ההורדות של המכשיר</div>
         </div>
         <div class="cmsg" id="pathMsg"></div>
       </div>
@@ -592,7 +598,7 @@ var T = {
     menuPathTitle:'תיקיית שמירה',pathLabel:'בחר תיקייה לשמירת קבצי PDF',choosePath:'בחר תיקייה',
     pathSet:'✅ תיקייה נבחרה: ',pathErr:'❌ הדפדפן לא תומך בבחירת תיקייה',pathCleared:'תיקייה הוסרה',
     menuMailTitle:'נמענים',mailLabel:'כתובות מייל לשליחת דוחות',mailAdded:'✅ נמען נוסף',mailRemoved:'נמען הוסר',mailInvalid:'כתובת מייל לא תקינה',
-    jsonPathLabel:'בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)',chooseJsonPath:'בחר תיקייה',jsonPathSet:'✅ תיקיית JSON נבחרה: ',jsonPathCleared:'תיקיית JSON הוסרה',
+    jsonPathLabel:'בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)',chooseJsonPath:'בחר תיקייה',jsonPathSet:'✅ תיקיית JSON נבחרה: ',jsonPathCleared:'תיקיית JSON הוסרה',unsupportedFolder:'הקבצים יישמרו אוטומטית בתיקיית ההורדות של המכשיר',
     menuLoadTitle:'טעינת דוח',loadLabel:'טען קובץ JSON לעריכה מחדש',loadReport:'טען דוח',loadOk:'✅ דוח נטען בהצלחה',loadErr:'❌ שגיאה בטעינת הקובץ',jsonSaved:'💾 JSON נשמר: ',
     darkMode:'🌙 מצב לילה',workHours:'⏱ סה״כ שעות עבודה: ',validationErr:'נא למלא את השדות המסומנים',totalHrsMin:' שעות ו-',
     camera:'צלם',secPhotos:'📷 תמונות',addPhoto:'לחץ לצילום או בחירת תמונה',takePhoto:'📷 צלם תמונה',fromGallery:'🖼 בחר מגלריה',photosRemain:'ניתן לצלם עוד: ~',photoDeleted:'תמונה נמחקה',photoAdded:'📷 תמונה נוספה',storageFull:'⚠️ הזיכרון מלא — שמור את הדוח לפני הוספת תמונות',
@@ -623,7 +629,7 @@ var T = {
     menuPathTitle:'Save Folder',pathLabel:'Choose folder for saving PDF files',choosePath:'Choose Folder',
     pathSet:'✅ Folder selected: ',pathErr:'❌ Browser does not support folder selection',pathCleared:'Folder removed',
     menuMailTitle:'Mail Recipients',mailLabel:'Email addresses for sending reports',mailAdded:'✅ Recipient added',mailRemoved:'Recipient removed',mailInvalid:'Invalid email address',
-    jsonPathLabel:'Choose folder for JSON files (backup for editing)',chooseJsonPath:'Choose Folder',jsonPathSet:'✅ JSON folder selected: ',jsonPathCleared:'JSON folder removed',
+    jsonPathLabel:'Choose folder for JSON files (backup for editing)',chooseJsonPath:'Choose Folder',jsonPathSet:'✅ JSON folder selected: ',jsonPathCleared:'JSON folder removed',unsupportedFolder:'Files will be saved automatically to your device Downloads folder',
     menuLoadTitle:'Load Report',loadLabel:'Load a JSON file for re-editing',loadReport:'Load Report',loadOk:'✅ Report loaded successfully',loadErr:'❌ Error loading file',jsonSaved:'💾 JSON saved: ',
     darkMode:'🌙 Dark Mode',workHours:'⏱ Total work hours: ',validationErr:'Please fill in the highlighted fields',totalHrsMin:' hours and ',
     camera:'Photo',secPhotos:'📷 Photos',addPhoto:'Tap to take photo or choose image',takePhoto:'📷 Take Photo',fromGallery:'🖼 From Gallery',photosRemain:'Photos remaining: ~',photoDeleted:'Photo deleted',photoAdded:'📷 Photo added',storageFull:'⚠️ Storage full — save report before adding more photos',
@@ -650,6 +656,7 @@ function applyLang(l){
   document.getElementById('menuMailTitle').innerHTML=T[l].menuMailTitle+' <span class="arrow">▾</span>';
   document.getElementById('mailLabel').textContent=T[l].mailLabel;
   document.getElementById('jsonPathLabel').textContent=T[l].jsonPathLabel;
+  document.getElementById('unsupportedMsg').textContent=T[l].unsupportedFolder;
   document.getElementById('menuLoadTitle').innerHTML=T[l].menuLoadTitle+' <span class="arrow">▾</span>';
   document.getElementById('loadLabel').textContent=T[l].loadLabel;
   document.getElementById('cfgUserLabel').textContent=T[l].cfgUserLabel;
@@ -1261,7 +1268,12 @@ function appLogout(){
   showToast(lang==='he'?'התנתקת בהצלחה':'Logged out successfully');
 }
 
-var sheetUrl=localStorage.getItem(SK)||'';
+var DEFAULT_SHEET_URL='https://script.google.com/macros/s/AKfycbwPIbkS_ygGa4lNUVYRi96kWqgM7BxgVnI5S1tQ6mAYPqk5qWdp3HOn_x8V1EHLbaXwTg/exec';
+var sheetUrl=localStorage.getItem(SK)||DEFAULT_SHEET_URL;
+// If localStorage was empty, save the default so the app connects automatically
+if(!localStorage.getItem(SK)&&DEFAULT_SHEET_URL){
+  localStorage.setItem(SK,DEFAULT_SHEET_URL);
+}
 var connected=false;
 
 function showToast(msg,dur){
@@ -1993,6 +2005,11 @@ document.addEventListener('DOMContentLoaded',function(){
   // Recalculate work hours if times were restored
   calcWorkHours();
   updateStorageInfo();
+  // Hide folder picker on unsupported browsers (Safari, Firefox, mobile)
+  if(!window.showDirectoryPicker){
+    document.getElementById('folderPickerSupported').style.display='none';
+    document.getElementById('folderPickerUnsupported').style.display='block';
+  }
   // Set today's date only if no saved date
   if(!document.getElementById('reportDate').value){
     document.getElementById('reportDate').value=new Date().toISOString().slice(0,10);
