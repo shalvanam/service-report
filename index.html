@@ -1846,6 +1846,20 @@ async function savePDF(){
     photoSectionHidden=true;
   }
   try{
+    // For landscape mode, temporarily widen the report content
+    var isLandscape=pdfOrientation==='l';
+    var origWidth='';
+    var origMaxWidth='';
+    var wrapEl=document.querySelector('.wrap');
+    if(isLandscape&&wrapEl){
+      origWidth=wrapEl.style.width;
+      origMaxWidth=wrapEl.style.maxWidth;
+      wrapEl.style.width='1120px';
+      wrapEl.style.maxWidth='1120px';
+      // Force reflow
+      wrapEl.offsetHeight;
+    }
+
     // Replace textareas with divs so line breaks render in html2canvas
     var taSwaps=[];
     el.querySelectorAll('textarea').forEach(function(ta){
@@ -1889,6 +1903,12 @@ async function savePDF(){
       s.ta.style.display='';
       s.div.parentNode.removeChild(s.div);
     });
+
+    // Restore form width if landscape
+    if(isLandscape&&wrapEl){
+      wrapEl.style.width=origWidth;
+      wrapEl.style.maxWidth=origMaxWidth;
+    }
 
     hide.forEach(function(h){h.style.display=h._origDisplay||''});
     if(photoBtnContainer){photoBtnContainer.style.display=photoBtnContainer._origDisplay||''}
@@ -1972,6 +1992,11 @@ async function savePDF(){
         s.ta.style.display='';
         if(s.div.parentNode) s.div.parentNode.removeChild(s.div);
       });
+    }
+    // Restore form width on error
+    if(isLandscape&&wrapEl){
+      wrapEl.style.width=origWidth;
+      wrapEl.style.maxWidth=origMaxWidth;
     }
     hide.forEach(function(h){h.style.display=h._origDisplay||''});
     if(photoBtnContainer){photoBtnContainer.style.display=photoBtnContainer._origDisplay||''}
