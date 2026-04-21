@@ -1,10 +1,10 @@
-var CACHE_NAME = 'spectro-v1';
+var CACHE_NAME = 'spectro-v2';
 var URLS_TO_CACHE = [
   './',
   './index.html'
 ];
 
-// Install: cache the app shell
+// Install: cache the app shell and activate immediately
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
@@ -14,7 +14,7 @@ self.addEventListener('install', function(event) {
   self.skipWaiting();
 });
 
-// Activate: clean old caches
+// Activate: clean old caches and take control immediately
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(keys) {
@@ -27,30 +27,21 @@ self.addEventListener('activate', function(event) {
   self.clients.claim();
 });
 
-// Fetch: network first for API calls, cache first for app files
+// Fetch: NETWORK-FIRST for everything
+// Always try to get the latest version from the server
+// Only use cache as fallback when offline
 self.addEventListener('fetch', function(event) {
-  var url = event.request.url;
-  
-  // Network-first for Google Sheet API and CDN resources
-  if (url.includes('script.google.com') || url.includes('fonts.google') || url.includes('cdnjs.cloudflare')) {
-    event.respondWith(
-      fetch(event.request).catch(function() {
-        return caches.match(event.request);
-      })
-    );
-    return;
-  }
-  
-  // Cache-first for app files
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request).then(function(fetchResp) {
-        var respClone = fetchResp.clone();
-        caches.open(CACHE_NAME).then(function(cache) {
-          cache.put(event.request, respClone);
-        });
-        return fetchResp;
+    fetch(event.request).then(function(networkResp) {
+      // Got response from network — update the cache with fresh version
+      var respClone = networkResp.clone();
+      caches.open(CACHE_NAME).then(function(cache) {
+        cache.put(event.request, respClone);
       });
+      return networkResp;
+    }).catch(function() {
+      // Network failed — serve from cache (offline fallback)
+      return caches.match(event.request);
     })
   );
 });
