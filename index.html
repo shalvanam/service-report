@@ -1870,7 +1870,7 @@ async function savePDF(){
   saveFactoryName(document.getElementById('factoryName').value.trim());
   showToast(t('pdfGen'));
   var el=document.getElementById('reportContent');
-  var hide=document.querySelectorAll('.abtn,.aibtn,.rbtn,.scl,.wl-rm,.photo-del,.photo-empty,.storage-bar,.storage-info,.sig-color-btn,#sigColorLabel');
+  var hide=document.querySelectorAll('.abtn,.aibtn,.rbtn,.scl,.wl-rm,.photo-del,.photo-empty,.storage-bar,.storage-info,.sig-color-btn,#sigColorLabel,.wl .n');
   hide.forEach(function(h){h._origDisplay=h.style.display;h.style.display='none'});
   // Hide the photo buttons container too
   var photoBtnContainer=document.querySelector('.photos-grid + div');
