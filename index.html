@@ -70,6 +70,9 @@ body.dark .autocomplete-item:hover{background:#450A0A}
 body.dark .photo-card{border-color:#475569;background:#0F172A}
 body.dark .photo-empty{border-color:#475569}
 body.dark .photo-empty:hover{border-color:var(--red);background:#450A0A}
+.sig-color-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--s2);cursor:pointer;transition:all .15s;padding:0}
+.sig-color-btn:hover{transform:scale(1.2)}
+.sig-color-btn.active{border-color:var(--s9);box-shadow:0 0 0 2px var(--w),0 0 0 4px var(--s9)}
 
 /* ══ LANDSCAPE PDF LAYOUT ══ */
 body.landscape-pdf .wrap{width:1120px!important;max-width:1120px!important}
@@ -240,7 +243,7 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
 
 @media print{
   .bar{position:static;box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact}
-  .bar .btns,.sync,.abtn,.aibtn,.rbtn,.scl,.wl-rm,.menu-toggle,.photo-del,.photo-empty,.storage-bar,.storage-info{display:none!important}
+  .bar .btns,.sync,.abtn,.aibtn,.rbtn,.scl,.wl-rm,.menu-toggle,.photo-del,.photo-empty,.storage-bar,.storage-info,.sig-color-btn{display:none!important}
   .menu-panel,.menu-overlay{display:none!important}
   body{background:white}.wrap{margin:0;padding:0}
   .cd,.rnum{box-shadow:none}
@@ -538,11 +541,11 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
     <div class="ct" data-t="sec6">⑥ סיכום ביצוע</div>
     <div class="fr">
       <div class="fg"><label data-t="techName">שם מבצע השירות</label><input type="text" id="techName"></div>
-      <div class="fg"><label data-t="startTime">שעת התחלה</label><input type="time" id="startTime" onchange="calcWorkHours()"></div>
+      <div class="fg"><label data-t="travelHours">שעות נסיעה</label><input type="text" id="travelHours"></div>
     </div>
     <div class="fr">
+      <div class="fg"><label data-t="startTime">שעת התחלה</label><input type="time" id="startTime" onchange="calcWorkHours()"></div>
       <div class="fg"><label data-t="endTime">שעת סיום</label><input type="time" id="endTime" onchange="calcWorkHours()"></div>
-      <div class="fg"><label data-t="travelHours">שעות נסיעה</label><input type="text" id="travelHours"></div>
     </div>
     <div class="work-hours" id="workHoursDisplay" style="display:none"></div>
     <div class="fr s1">
@@ -572,6 +575,14 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
           <button class="scl" onclick="clearSig('sigClient')" data-t="clear">נקה</button>
         </div>
       </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--s5)" id="sigColorLabel" data-t="sigColor">צבע חתימה:</span>
+      <button class="sig-color-btn" onclick="setSigColor('#000000')" style="background:#000000" title="שחור"></button>
+      <button class="sig-color-btn" onclick="setSigColor('#1D4ED8')" style="background:#1D4ED8" title="כחול"></button>
+      <button class="sig-color-btn" onclick="setSigColor('#B91C1C')" style="background:#B91C1C" title="אדום"></button>
+      <button class="sig-color-btn" onclick="setSigColor('#065F46')" style="background:#065F46" title="ירוק"></button>
+      <button class="sig-color-btn" onclick="setSigColor('#6D28D9')" style="background:#6D28D9" title="סגול"></button>
     </div>
   </div>
 
@@ -616,7 +627,7 @@ var T = {
     pathSet:'✅ תיקייה נבחרה: ',pathErr:'❌ הדפדפן לא תומך בבחירת תיקייה',pathCleared:'תיקייה הוסרה',
     menuMailTitle:'נמענים',mailLabel:'כתובות מייל לשליחת דוחות',mailAdded:'✅ נמען נוסף',mailRemoved:'נמען הוסר',mailInvalid:'כתובת מייל לא תקינה',
     jsonPathLabel:'בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)',chooseJsonPath:'בחר תיקייה',jsonPathSet:'✅ תיקיית JSON נבחרה: ',jsonPathCleared:'תיקיית JSON הוסרה',unsupportedFolder:'הקבצים יישמרו אוטומטית בתיקיית ההורדות של המכשיר',
-    orientationLabel:'כיוון PDF',portrait:'📄 לאורך',landscape:'📄 לרוחב',rotate:'סובב',
+    orientationLabel:'כיוון PDF',portrait:'📄 לאורך',landscape:'📄 לרוחב',rotate:'סובב',sigColor:'צבע חתימה:',
     menuLoadTitle:'טעינת דוח',loadLabel:'טען קובץ JSON לעריכה מחדש',loadReport:'טען דוח',loadOk:'✅ דוח נטען בהצלחה',loadErr:'❌ שגיאה בטעינת הקובץ',jsonSaved:'💾 JSON נשמר: ',
     darkMode:'🌙 מצב לילה',workHours:'⏱ סה״כ שעות עבודה: ',validationErr:'נא למלא את השדות המסומנים',totalHrsMin:' שעות ו-',
     camera:'צלם',secPhotos:'📷 תמונות',addPhoto:'לחץ לצילום או בחירת תמונה',takePhoto:'📷 צלם תמונה',fromGallery:'🖼 בחר מגלריה',photosRemain:'ניתן לצלם עוד: ~',photoDeleted:'תמונה נמחקה',photoAdded:'📷 תמונה נוספה',storageFull:'⚠️ הזיכרון מלא — שמור את הדוח לפני הוספת תמונות',
@@ -648,7 +659,7 @@ var T = {
     pathSet:'✅ Folder selected: ',pathErr:'❌ Browser does not support folder selection',pathCleared:'Folder removed',
     menuMailTitle:'Mail Recipients',mailLabel:'Email addresses for sending reports',mailAdded:'✅ Recipient added',mailRemoved:'Recipient removed',mailInvalid:'Invalid email address',
     jsonPathLabel:'Choose folder for JSON files (backup for editing)',chooseJsonPath:'Choose Folder',jsonPathSet:'✅ JSON folder selected: ',jsonPathCleared:'JSON folder removed',unsupportedFolder:'Files will be saved automatically to your device Downloads folder',
-    orientationLabel:'PDF Orientation',portrait:'📄 Portrait',landscape:'📄 Landscape',rotate:'Rotate',
+    orientationLabel:'PDF Orientation',portrait:'📄 Portrait',landscape:'📄 Landscape',rotate:'Rotate',sigColor:'Signature color:',
     menuLoadTitle:'Load Report',loadLabel:'Load a JSON file for re-editing',loadReport:'Load Report',loadOk:'✅ Report loaded successfully',loadErr:'❌ Error loading file',jsonSaved:'💾 JSON saved: ',
     darkMode:'🌙 Dark Mode',workHours:'⏱ Total work hours: ',validationErr:'Please fill in the highlighted fields',totalHrsMin:' hours and ',
     camera:'Photo',secPhotos:'📷 Photos',addPhoto:'Tap to take photo or choose image',takePhoto:'📷 Take Photo',fromGallery:'🖼 From Gallery',photosRemain:'Photos remaining: ~',photoDeleted:'Photo deleted',photoAdded:'📷 Photo added',storageFull:'⚠️ Storage full — save report before adding more photos',
@@ -1468,6 +1479,32 @@ function removeItemRow(b){
 /* ═══════════════════════════════════════════
    Signatures
    ═══════════════════════════════════════════ */
+var sigColor=localStorage.getItem('spectro_sig_color')||'#000000';
+
+function setSigColor(color){
+  sigColor=color;
+  localStorage.setItem('spectro_sig_color',color);
+  // Update active button
+  document.querySelectorAll('.sig-color-btn').forEach(function(btn){
+    btn.classList.toggle('active',btn.style.background===color||btn.style.backgroundColor===color);
+  });
+}
+
+function initSigColorButtons(){
+  document.querySelectorAll('.sig-color-btn').forEach(function(btn){
+    var bg=btn.style.backgroundColor||btn.style.background;
+    // Normalize color comparison
+    var canvas=document.createElement('canvas');
+    canvas.width=1;canvas.height=1;
+    var ctx=canvas.getContext('2d');
+    ctx.fillStyle=bg;
+    var normalized1=ctx.fillStyle;
+    ctx.fillStyle=sigColor;
+    var normalized2=ctx.fillStyle;
+    btn.classList.toggle('active',normalized1===normalized2);
+  });
+}
+
 function initSig(cid){
   var box=document.getElementById(cid);
   var cvs=box.querySelector('canvas');
@@ -1477,7 +1514,7 @@ function initSig(cid){
   resize();window.addEventListener('resize',resize);
   function pos(e){var r=cvs.getBoundingClientRect();var t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top}}
   function start(e){e.preventDefault();drawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y)}
-  function move(e){if(!drawing)return;e.preventDefault();var p=pos(e);ctx.lineWidth=2;ctx.lineCap='round';ctx.strokeStyle='#1e293b';ctx.lineTo(p.x,p.y);ctx.stroke();if(!has){has=true;box.classList.add('has')}}
+  function move(e){if(!drawing)return;e.preventDefault();var p=pos(e);ctx.lineWidth=2;ctx.lineCap='round';ctx.strokeStyle=sigColor;ctx.lineTo(p.x,p.y);ctx.stroke();if(!has){has=true;box.classList.add('has')}}
   function stop(){drawing=false}
   cvs.addEventListener('mousedown',start);cvs.addEventListener('mousemove',move);
   cvs.addEventListener('mouseup',stop);cvs.addEventListener('mouseleave',stop);
@@ -1833,7 +1870,7 @@ async function savePDF(){
   saveFactoryName(document.getElementById('factoryName').value.trim());
   showToast(t('pdfGen'));
   var el=document.getElementById('reportContent');
-  var hide=document.querySelectorAll('.abtn,.aibtn,.rbtn,.scl,.wl-rm,.photo-del,.photo-empty,.storage-bar,.storage-info');
+  var hide=document.querySelectorAll('.abtn,.aibtn,.rbtn,.scl,.wl-rm,.photo-del,.photo-empty,.storage-bar,.storage-info,.sig-color-btn,#sigColorLabel');
   hide.forEach(function(h){h._origDisplay=h.style.display;h.style.display='none'});
   // Hide the photo buttons container too
   var photoBtnContainer=document.querySelector('.photos-grid + div');
@@ -2116,6 +2153,7 @@ async function sendFiles(){
    ═══════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',function(){
   initSig('sigTech');initSig('sigClient');
+  initSigColorButtons();
   renderMailList();
   restoreDarkMode();
   // Check login
