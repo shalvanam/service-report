@@ -70,6 +70,22 @@ body.dark .autocomplete-item:hover{background:#450A0A}
 body.dark .photo-card{border-color:#475569;background:#0F172A}
 body.dark .photo-empty{border-color:#475569}
 body.dark .photo-empty:hover{border-color:var(--red);background:#450A0A}
+
+/* ══ LANDSCAPE PDF LAYOUT ══ */
+body.landscape-pdf .wrap{width:1120px!important;max-width:1120px!important}
+body.landscape-pdf .cd.land-merge-1,
+body.landscape-pdf .cd.land-merge-2{display:inline-block;vertical-align:top;width:49%;box-sizing:border-box}
+body.landscape-pdf .cd.land-merge-1{margin-left:2%}
+body.landscape-pdf .cd.land-merge-2{margin-left:0}
+body.landscape-pdf .fgrid{display:flex;gap:20px}
+body.landscape-pdf .sig-block{flex:1}
+body.landscape-pdf .sbox{min-height:100px}
+body.landscape-pdf .fr.t3{display:flex;gap:10px}
+body.landscape-pdf .fr.t3 .fg{flex:1}
+body.landscape-pdf .cd.land-exec .fr{display:flex;gap:10px}
+body.landscape-pdf .cd.land-exec .fr .fg{flex:1}
+body.landscape-pdf .cd.land-exec .fr.s1{display:flex}
+body.landscape-pdf .cd.land-exec .fr.s1 .fg{flex:0 0 33%}
 .photo-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);color:#fff;font-size:10px;padding:4px 6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Rubik',sans-serif}
 .photo-name.empty{background:rgba(0,0,0,.35);font-style:italic;color:rgba(255,255,255,.7)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -1851,13 +1867,22 @@ async function savePDF(){
     var origWidth='';
     var origMaxWidth='';
     var wrapEl=document.querySelector('.wrap');
-    if(isLandscape&&wrapEl){
-      origWidth=wrapEl.style.width;
-      origMaxWidth=wrapEl.style.maxWidth;
-      wrapEl.style.width='1120px';
-      wrapEl.style.maxWidth='1120px';
+    if(isLandscape){
+      document.body.classList.add('landscape-pdf');
+      // Mark sections for two-column merge
+      var allCd=el.querySelectorAll('.cd');
+      // Section 0 = General Details, Section 1 = Device Details — side by side
+      if(allCd[0])allCd[0].classList.add('land-merge-1');
+      if(allCd[1])allCd[1].classList.add('land-merge-2');
+      // Execution summary — compact layout
+      allCd.forEach(function(cd){
+        var ct=cd.querySelector('.ct');
+        if(ct&&(ct.textContent.indexOf('סיכום')!==-1||ct.textContent.indexOf('Summary')!==-1)){
+          cd.classList.add('land-exec');
+        }
+      });
       // Force reflow
-      wrapEl.offsetHeight;
+      if(wrapEl) wrapEl.offsetHeight;
     }
 
     // Replace textareas with divs so line breaks render in html2canvas
@@ -1905,9 +1930,11 @@ async function savePDF(){
     });
 
     // Restore form width if landscape
-    if(isLandscape&&wrapEl){
-      wrapEl.style.width=origWidth;
-      wrapEl.style.maxWidth=origMaxWidth;
+    if(isLandscape){
+      document.body.classList.remove('landscape-pdf');
+      el.querySelectorAll('.land-merge-1,.land-merge-2,.land-exec').forEach(function(cd){
+        cd.classList.remove('land-merge-1','land-merge-2','land-exec');
+      });
     }
 
     hide.forEach(function(h){h.style.display=h._origDisplay||''});
@@ -1994,9 +2021,11 @@ async function savePDF(){
       });
     }
     // Restore form width on error
-    if(isLandscape&&wrapEl){
-      wrapEl.style.width=origWidth;
-      wrapEl.style.maxWidth=origMaxWidth;
+    if(isLandscape){
+      document.body.classList.remove('landscape-pdf');
+      el.querySelectorAll('.land-merge-1,.land-merge-2,.land-exec').forEach(function(cd){
+        cd.classList.remove('land-merge-1','land-merge-2','land-exec');
+      });
     }
     hide.forEach(function(h){h.style.display=h._origDisplay||''});
     if(photoBtnContainer){photoBtnContainer.style.display=photoBtnContainer._origDisplay||''}
