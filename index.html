@@ -73,18 +73,13 @@ body.dark .photo-empty:hover{border-color:var(--red);background:#450A0A}
 
 /* ══ LANDSCAPE PDF LAYOUT ══ */
 body.landscape-pdf .wrap{width:1120px!important;max-width:1120px!important}
-body.landscape-pdf .cd.land-merge-1,
-body.landscape-pdf .cd.land-merge-2{display:inline-block;vertical-align:top;width:49%;box-sizing:border-box}
-body.landscape-pdf .cd.land-merge-1{margin-left:2%}
-body.landscape-pdf .cd.land-merge-2{margin-left:0}
+.land-row{display:flex!important;gap:16px;margin-bottom:0}
+.land-row>.cd{flex:1;margin-bottom:0}
 body.landscape-pdf .fgrid{display:flex;gap:20px}
 body.landscape-pdf .sig-block{flex:1}
 body.landscape-pdf .sbox{min-height:100px}
-body.landscape-pdf .fr.t3{display:flex;gap:10px}
-body.landscape-pdf .fr.t3 .fg{flex:1}
 body.landscape-pdf .cd.land-exec .fr{display:flex;gap:10px}
 body.landscape-pdf .cd.land-exec .fr .fg{flex:1}
-body.landscape-pdf .cd.land-exec .fr.s1{display:flex}
 body.landscape-pdf .cd.land-exec .fr.s1 .fg{flex:0 0 33%}
 .photo-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);color:#fff;font-size:10px;padding:4px 6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Rubik',sans-serif}
 .photo-name.empty{background:rgba(0,0,0,.35);font-style:italic;color:rgba(255,255,255,.7)}
@@ -1864,17 +1859,20 @@ async function savePDF(){
   try{
     // For landscape mode, temporarily widen the report content
     var isLandscape=pdfOrientation==='l';
-    var origWidth='';
-    var origMaxWidth='';
-    var wrapEl=document.querySelector('.wrap');
+    var landRow=null;
     if(isLandscape){
       document.body.classList.add('landscape-pdf');
-      // Mark sections for two-column merge
+      // Wrap General Details + Device Details in a flex row
       var allCd=el.querySelectorAll('.cd');
-      // Section 0 = General Details, Section 1 = Device Details — side by side
-      if(allCd[0])allCd[0].classList.add('land-merge-1');
-      if(allCd[1])allCd[1].classList.add('land-merge-2');
+      if(allCd[0]&&allCd[1]){
+        landRow=document.createElement('div');
+        landRow.className='land-row';
+        allCd[0].parentNode.insertBefore(landRow,allCd[0]);
+        landRow.appendChild(allCd[0]);
+        landRow.appendChild(allCd[1]);
+      }
       // Execution summary — compact layout
+      allCd=el.querySelectorAll('.cd');
       allCd.forEach(function(cd){
         var ct=cd.querySelector('.ct');
         if(ct&&(ct.textContent.indexOf('סיכום')!==-1||ct.textContent.indexOf('Summary')!==-1)){
@@ -1882,7 +1880,7 @@ async function savePDF(){
         }
       });
       // Force reflow
-      if(wrapEl) wrapEl.offsetHeight;
+      el.offsetHeight;
     }
 
     // Replace textareas with divs so line breaks render in html2canvas
@@ -1929,11 +1927,18 @@ async function savePDF(){
       s.div.parentNode.removeChild(s.div);
     });
 
-    // Restore form width if landscape
+    // Restore landscape layout
     if(isLandscape){
       document.body.classList.remove('landscape-pdf');
-      el.querySelectorAll('.land-merge-1,.land-merge-2,.land-exec').forEach(function(cd){
-        cd.classList.remove('land-merge-1','land-merge-2','land-exec');
+      // Unwrap the flex row — move sections back
+      if(landRow&&landRow.parentNode){
+        while(landRow.firstChild){
+          landRow.parentNode.insertBefore(landRow.firstChild,landRow);
+        }
+        landRow.parentNode.removeChild(landRow);
+      }
+      el.querySelectorAll('.land-exec').forEach(function(cd){
+        cd.classList.remove('land-exec');
       });
     }
 
@@ -2023,8 +2028,14 @@ async function savePDF(){
     // Restore form width on error
     if(isLandscape){
       document.body.classList.remove('landscape-pdf');
-      el.querySelectorAll('.land-merge-1,.land-merge-2,.land-exec').forEach(function(cd){
-        cd.classList.remove('land-merge-1','land-merge-2','land-exec');
+      if(landRow&&landRow.parentNode){
+        while(landRow.firstChild){
+          landRow.parentNode.insertBefore(landRow.firstChild,landRow);
+        }
+        landRow.parentNode.removeChild(landRow);
+      }
+      el.querySelectorAll('.land-exec').forEach(function(cd){
+        cd.classList.remove('land-exec');
       });
     }
     hide.forEach(function(h){h.style.display=h._origDisplay||''});
