@@ -348,6 +348,12 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
           <div id="unsupportedMsg" style="font-size:13px;color:var(--s5);line-height:1.6">הקבצים יישמרו אוטומטית בתיקיית ההורדות של המכשיר</div>
         </div>
         <div class="cmsg" id="pathMsg"></div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--s2)"></div>
+        <label id="orientationLabel">כיוון PDF</label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="cbtn" id="btnPortrait" onclick="setPdfOrientation('p')" style="flex:1;font-size:12px">📄 <span data-t="portrait">לאורך</span></button>
+          <button class="cbtn" id="btnLandscape" onclick="setPdfOrientation('l')" style="flex:1;font-size:12px">📄 <span data-t="landscape">לרוחב</span></button>
+        </div>
       </div>
     </div>
   </div>
@@ -399,6 +405,7 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
     <button class="btn btn-pr" onclick="window.print()">🖨 <span data-t="print">הדפסה</span></button>
     <button class="btn btn-save" onclick="savePDF()">💾 <span data-t="save">שמור</span></button>
     <button class="btn btn-cam" onclick="takePhoto()">📷 <span data-t="camera">צלם</span></button>
+    <button class="btn" onclick="toggleScreenRotation()" id="rotateBtn" style="background:#6366F1;color:#fff;box-shadow:0 2px 8px rgba(99,102,241,.3)">🔄 <span data-t="rotate">סובב</span></button>
     <button class="btn btn-send" onclick="sendFiles()">📤 <span data-t="send">שלח</span></button>
     <button class="btn btn-new" id="btnNew" onclick="confirmNewReport()" disabled>+ <span data-t="newReport">דוח חדש</span></button>
   </div>
@@ -599,6 +606,7 @@ var T = {
     pathSet:'✅ תיקייה נבחרה: ',pathErr:'❌ הדפדפן לא תומך בבחירת תיקייה',pathCleared:'תיקייה הוסרה',
     menuMailTitle:'נמענים',mailLabel:'כתובות מייל לשליחת דוחות',mailAdded:'✅ נמען נוסף',mailRemoved:'נמען הוסר',mailInvalid:'כתובת מייל לא תקינה',
     jsonPathLabel:'בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)',chooseJsonPath:'בחר תיקייה',jsonPathSet:'✅ תיקיית JSON נבחרה: ',jsonPathCleared:'תיקיית JSON הוסרה',unsupportedFolder:'הקבצים יישמרו אוטומטית בתיקיית ההורדות של המכשיר',
+    orientationLabel:'כיוון PDF',portrait:'📄 לאורך',landscape:'📄 לרוחב',rotate:'סובב',
     menuLoadTitle:'טעינת דוח',loadLabel:'טען קובץ JSON לעריכה מחדש',loadReport:'טען דוח',loadOk:'✅ דוח נטען בהצלחה',loadErr:'❌ שגיאה בטעינת הקובץ',jsonSaved:'💾 JSON נשמר: ',
     darkMode:'🌙 מצב לילה',workHours:'⏱ סה״כ שעות עבודה: ',validationErr:'נא למלא את השדות המסומנים',totalHrsMin:' שעות ו-',
     camera:'צלם',secPhotos:'📷 תמונות',addPhoto:'לחץ לצילום או בחירת תמונה',takePhoto:'📷 צלם תמונה',fromGallery:'🖼 בחר מגלריה',photosRemain:'ניתן לצלם עוד: ~',photoDeleted:'תמונה נמחקה',photoAdded:'📷 תמונה נוספה',storageFull:'⚠️ הזיכרון מלא — שמור את הדוח לפני הוספת תמונות',
@@ -630,6 +638,7 @@ var T = {
     pathSet:'✅ Folder selected: ',pathErr:'❌ Browser does not support folder selection',pathCleared:'Folder removed',
     menuMailTitle:'Mail Recipients',mailLabel:'Email addresses for sending reports',mailAdded:'✅ Recipient added',mailRemoved:'Recipient removed',mailInvalid:'Invalid email address',
     jsonPathLabel:'Choose folder for JSON files (backup for editing)',chooseJsonPath:'Choose Folder',jsonPathSet:'✅ JSON folder selected: ',jsonPathCleared:'JSON folder removed',unsupportedFolder:'Files will be saved automatically to your device Downloads folder',
+    orientationLabel:'PDF Orientation',portrait:'📄 Portrait',landscape:'📄 Landscape',rotate:'Rotate',
     menuLoadTitle:'Load Report',loadLabel:'Load a JSON file for re-editing',loadReport:'Load Report',loadOk:'✅ Report loaded successfully',loadErr:'❌ Error loading file',jsonSaved:'💾 JSON saved: ',
     darkMode:'🌙 Dark Mode',workHours:'⏱ Total work hours: ',validationErr:'Please fill in the highlighted fields',totalHrsMin:' hours and ',
     camera:'Photo',secPhotos:'📷 Photos',addPhoto:'Tap to take photo or choose image',takePhoto:'📷 Take Photo',fromGallery:'🖼 From Gallery',photosRemain:'Photos remaining: ~',photoDeleted:'Photo deleted',photoAdded:'📷 Photo added',storageFull:'⚠️ Storage full — save report before adding more photos',
@@ -657,6 +666,7 @@ function applyLang(l){
   document.getElementById('mailLabel').textContent=T[l].mailLabel;
   document.getElementById('jsonPathLabel').textContent=T[l].jsonPathLabel;
   document.getElementById('unsupportedMsg').textContent=T[l].unsupportedFolder;
+  document.getElementById('orientationLabel').textContent=T[l].orientationLabel;
   document.getElementById('menuLoadTitle').innerHTML=T[l].menuLoadTitle+' <span class="arrow">▾</span>';
   document.getElementById('loadLabel').textContent=T[l].loadLabel;
   document.getElementById('cfgUserLabel').textContent=T[l].cfgUserLabel;
@@ -894,6 +904,54 @@ function clearJsonPath(){
   document.getElementById('jsonPathDisplay').style.display='none';
   document.getElementById('jsonPathName').textContent='';
   showToast(t('jsonPathCleared'));
+}
+
+/* ═══════════════════════════════════════════
+   PDF Orientation Setting
+   ═══════════════════════════════════════════ */
+var pdfOrientation=localStorage.getItem('spectro_pdf_orientation')||'p';
+
+/* ═══════════════════════════════════════════
+   Screen Rotation
+   ═══════════════════════════════════════════ */
+var isRotated=false;
+
+function toggleScreenRotation(){
+  isRotated=!isRotated;
+  if(isRotated){
+    document.body.style.transform='rotate(90deg)';
+    document.body.style.transformOrigin='top left';
+    document.body.style.width='100vh';
+    document.body.style.height='100vw';
+    document.body.style.position='fixed';
+    document.body.style.top='0';
+    document.body.style.left='100%';
+    document.body.style.overflow='auto';
+  }else{
+    document.body.style.transform='';
+    document.body.style.transformOrigin='';
+    document.body.style.width='';
+    document.body.style.height='';
+    document.body.style.position='';
+    document.body.style.top='';
+    document.body.style.left='';
+    document.body.style.overflow='';
+  }
+}
+
+function setPdfOrientation(o){
+  pdfOrientation=o;
+  localStorage.setItem('spectro_pdf_orientation',o);
+  updateOrientationButtons();
+}
+
+function updateOrientationButtons(){
+  var btnP=document.getElementById('btnPortrait');
+  var btnL=document.getElementById('btnLandscape');
+  btnP.style.background=pdfOrientation==='p'?'var(--red)':'var(--s2)';
+  btnP.style.color=pdfOrientation==='p'?'#fff':'var(--s7)';
+  btnL.style.background=pdfOrientation==='l'?'var(--red)':'var(--s2)';
+  btnL.style.color=pdfOrientation==='l'?'#fff':'var(--s7)';
 }
 
 /* ═══════════════════════════════════════════
@@ -1839,8 +1897,8 @@ async function savePDF(){
     infoBar.style.display='none';
 
     var jsPDF=window.jspdf.jsPDF;
-    var pdf=new jsPDF('p','mm','a4');
-    var pdfW=210,pdfH=297;
+    var pdf=new jsPDF(pdfOrientation,'mm','a4');
+    var pdfW=pdfOrientation==='l'?297:210,pdfH=pdfOrientation==='l'?210:297;
     var margin=4;
     var contentW=pdfW-margin*2;
     var usableH=pdfH-margin*2;
@@ -2010,6 +2068,7 @@ document.addEventListener('DOMContentLoaded',function(){
     document.getElementById('folderPickerSupported').style.display='none';
     document.getElementById('folderPickerUnsupported').style.display='block';
   }
+  updateOrientationButtons();
   // Set today's date only if no saved date
   if(!document.getElementById('reportDate').value){
     document.getElementById('reportDate').value=new Date().toISOString().slice(0,10);
