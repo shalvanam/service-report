@@ -998,16 +998,38 @@ async function saveFileWithPicker(blob,suggestedName,pickerId){
   try{
     var ext=suggestedName.split('.').pop().toLowerCase();
     var types=[];
+    var startDir=null;
     if(ext==='pdf'){
       types=[{description:'PDF Document',accept:{'application/pdf':['.pdf']}}];
+      // Try PDF subfolder first, then parent folder
+      if(saveDirHandle) startDir=saveDirHandle;
+      else if(parentDirHandle){
+        try{
+          saveDirHandle=await parentDirHandle.getDirectoryHandle('PDF',{create:true});
+          startDir=saveDirHandle;
+        }catch(e){}
+      }
     }else if(ext==='json'){
       types=[{description:'JSON File',accept:{'application/json':['.json']}}];
+      // Try JSON subfolder first, then parent folder
+      if(jsonDirHandle) startDir=jsonDirHandle;
+      else if(parentDirHandle){
+        try{
+          jsonDirHandle=await parentDirHandle.getDirectoryHandle('JSON',{create:true});
+          startDir=jsonDirHandle;
+        }catch(e){}
+      }
     }
     var opts={
       suggestedName:suggestedName,
       types:types,
       id:pickerId||'default'
     };
+    if(startDir){
+      opts.startIn=startDir;
+    }else{
+      opts.startIn='documents';
+    }
     var fh=await window.showSaveFilePicker(opts);
     var w=await fh.createWritable();
     await w.write(blob);
