@@ -363,12 +363,6 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
         </div>
         <div class="cmsg" id="pathMsg"></div>
         <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--s2)"></div>
-        <label id="saveModeLabel">אופן שמירה</label>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <button class="cbtn" id="btnSavePreset" onclick="setSaveMode('preset')" style="flex:1;font-size:11px">📂 <span data-t="savePreset">תיקייה קבועה</span></button>
-          <button class="cbtn" id="btnSaveAsk" onclick="setSaveMode('ask')" style="flex:1;font-size:11px">💾 <span data-t="saveAsk">בחר כל פעם</span></button>
-        </div>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--s2)"></div>
         <label id="orientationLabel">כיוון PDF</label>
         <div style="display:flex;gap:8px;margin-top:6px">
           <button class="cbtn" id="btnPortrait" onclick="setPdfOrientation('p')" style="flex:1;font-size:12px">📄 <span data-t="portrait">לאורך</span></button>
@@ -634,7 +628,6 @@ var T = {
     menuMailTitle:'נמענים',mailLabel:'כתובות מייל לשליחת דוחות',mailAdded:'✅ נמען נוסף',mailRemoved:'נמען הוסר',mailInvalid:'כתובת מייל לא תקינה',
     jsonPathLabel:'בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)',chooseJsonPath:'בחר תיקייה',jsonPathSet:'✅ תיקיית JSON נבחרה: ',jsonPathCleared:'תיקיית JSON הוסרה',unsupportedFolder:'הקבצים יישמרו אוטומטית בתיקיית ההורדות של המכשיר',
     orientationLabel:'כיוון PDF',portrait:'📄 לאורך',landscape:'📄 לרוחב',rotate:'סובב',sigColor:'צבע חתימה:',
-    saveModeLabel:'אופן שמירה',savePreset:'📂 תיקייה קבועה',saveAsk:'💾 בחר כל פעם',
     menuLoadTitle:'טעינת דוח',loadLabel:'טען קובץ JSON לעריכה מחדש',loadReport:'טען דוח',loadOk:'✅ דוח נטען בהצלחה',loadErr:'❌ שגיאה בטעינת הקובץ',jsonSaved:'💾 JSON נשמר: ',
     darkMode:'🌙 מצב לילה',workHours:'⏱ סה״כ שעות עבודה: ',validationErr:'נא למלא את השדות המסומנים',totalHrsMin:' שעות ו-',
     camera:'צלם',secPhotos:'📷 תמונות',addPhoto:'לחץ לצילום או בחירת תמונה',takePhoto:'📷 צלם תמונה',fromGallery:'🖼 בחר מגלריה',photosRemain:'ניתן לצלם עוד: ~',photoDeleted:'תמונה נמחקה',photoAdded:'📷 תמונה נוספה',storageFull:'⚠️ הזיכרון מלא — שמור את הדוח לפני הוספת תמונות',
@@ -667,7 +660,6 @@ var T = {
     menuMailTitle:'Mail Recipients',mailLabel:'Email addresses for sending reports',mailAdded:'✅ Recipient added',mailRemoved:'Recipient removed',mailInvalid:'Invalid email address',
     jsonPathLabel:'Choose folder for JSON files (backup for editing)',chooseJsonPath:'Choose Folder',jsonPathSet:'✅ JSON folder selected: ',jsonPathCleared:'JSON folder removed',unsupportedFolder:'Files will be saved automatically to your device Downloads folder',
     orientationLabel:'PDF Orientation',portrait:'📄 Portrait',landscape:'📄 Landscape',rotate:'Rotate',sigColor:'Signature color:',
-    saveModeLabel:'Save Mode',savePreset:'📂 Preset Folder',saveAsk:'💾 Ask Each Time',
     menuLoadTitle:'Load Report',loadLabel:'Load a JSON file for re-editing',loadReport:'Load Report',loadOk:'✅ Report loaded successfully',loadErr:'❌ Error loading file',jsonSaved:'💾 JSON saved: ',
     darkMode:'🌙 Dark Mode',workHours:'⏱ Total work hours: ',validationErr:'Please fill in the highlighted fields',totalHrsMin:' hours and ',
     camera:'Photo',secPhotos:'📷 Photos',addPhoto:'Tap to take photo or choose image',takePhoto:'📷 Take Photo',fromGallery:'🖼 From Gallery',photosRemain:'Photos remaining: ~',photoDeleted:'Photo deleted',photoAdded:'📷 Photo added',storageFull:'⚠️ Storage full — save report before adding more photos',
@@ -696,7 +688,6 @@ function applyLang(l){
   document.getElementById('jsonPathLabel').textContent=T[l].jsonPathLabel;
   document.getElementById('unsupportedMsg').textContent=T[l].unsupportedFolder;
   document.getElementById('orientationLabel').textContent=T[l].orientationLabel;
-  document.getElementById('saveModeLabel').textContent=T[l].saveModeLabel;
   document.getElementById('menuLoadTitle').innerHTML=T[l].menuLoadTitle+' <span class="arrow">▾</span>';
   document.getElementById('loadLabel').textContent=T[l].loadLabel;
   document.getElementById('cfgUserLabel').textContent=T[l].cfgUserLabel;
@@ -985,62 +976,6 @@ function updateOrientationButtons(){
 }
 
 /* ═══════════════════════════════════════════
-   Save Mode: Preset Folder vs Ask Each Time
-   ═══════════════════════════════════════════ */
-var saveMode=localStorage.getItem('spectro_save_mode')||'preset';
-
-function setSaveMode(mode){
-  saveMode=mode;
-  localStorage.setItem('spectro_save_mode',mode);
-  updateSaveModeButtons();
-}
-
-function updateSaveModeButtons(){
-  var btnP=document.getElementById('btnSavePreset');
-  var btnA=document.getElementById('btnSaveAsk');
-  btnP.style.background=saveMode==='preset'?'var(--red)':'var(--s2)';
-  btnP.style.color=saveMode==='preset'?'#fff':'var(--s7)';
-  btnA.style.background=saveMode==='ask'?'var(--red)':'var(--s2)';
-  btnA.style.color=saveMode==='ask'?'#fff':'var(--s7)';
-  // Show/hide folder picker sections based on mode
-  var fpSupported=document.getElementById('folderPickerSupported');
-  if(fpSupported&&window.showDirectoryPicker){
-    fpSupported.style.display=saveMode==='preset'?'':'none';
-  }
-}
-
-async function saveFileWithPicker(blob,suggestedName,pickerId){
-  if(!window.showSaveFilePicker){
-    downloadBlob(blob,suggestedName);
-    return;
-  }
-  try{
-    var ext=suggestedName.split('.').pop().toLowerCase();
-    var types=[];
-    if(ext==='pdf'){
-      types=[{description:'PDF Document',accept:{'application/pdf':['.pdf']}}];
-    }else if(ext==='json'){
-      types=[{description:'JSON File',accept:{'application/json':['.json']}}];
-    }
-    var opts={
-      suggestedName:suggestedName,
-      types:types,
-      id:pickerId||'default'
-    };
-    var fh=await window.showSaveFilePicker(opts);
-    var w=await fh.createWritable();
-    await w.write(blob);
-    await w.close();
-    return fh.name;
-  }catch(e){
-    if(e.name!=='AbortError'){
-      downloadBlob(blob,suggestedName);
-    }
-    return null;
-  }
-}
-
-/* ═══════════════════════════════════════════
    Collect form data as object (reusable)
    ═══════════════════════════════════════════ */
 function collectFormData(){
@@ -1099,28 +1034,10 @@ async function saveJsonFile(fileName){
 }
 
 function downloadBlob(blob,name){
-  // Try modern approach first
-  if(navigator.share&&blob.size>0){
-    try{
-      var file=new File([blob],name,{type:blob.type});
-      navigator.share({files:[file]}).catch(function(){fallbackDownload(blob,name)});
-      return;
-    }catch(e){}
-  }
-  fallbackDownload(blob,name);
-}
-
-function fallbackDownload(blob,name){
   var a=document.createElement('a');
-  var url=URL.createObjectURL(blob);
-  a.href=url;
-  a.download=name;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function(){
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  },100);
+  a.href=URL.createObjectURL(blob);
+  a.download=name;a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 /* ═══════════════════════════════════════════
@@ -2124,33 +2041,19 @@ async function savePDF(){
     var num=document.getElementById('reportNum').value||'0';
     var dt=document.getElementById('reportDate').value||new Date().toISOString().slice(0,10);
     var fn=cust+'_'+num+'_'+dt+'.pdf';
-    var pdfBlob=pdf.output('blob');
-    if(saveMode==='ask'&&window.showSaveFilePicker){
-      // Ask mode: show file picker for each file
-      var savedName=await saveFileWithPicker(pdfBlob,fn,'spectro-pdf');
-      if(savedName) showToast(t('pdfOk')+savedName);
-      // Save JSON with its own picker
-      var jsonData=collectFormData();
-      var jsonStr=JSON.stringify(jsonData,null,2);
-      var jsonName=fn.replace('.pdf','.json');
-      var jsonBlob=new Blob([jsonStr],{type:'application/json'});
-      var savedJson=await saveFileWithPicker(jsonBlob,jsonName,'spectro-json');
-      if(savedJson) showToast(t('jsonSaved')+savedJson);
+    if(saveDirHandle){
+      try{
+        var fileHandle=await saveDirHandle.getFileHandle(fn,{create:true});
+        var writable=await fileHandle.createWritable();
+        await writable.write(pdf.output('blob'));
+        await writable.close();
+      }catch(e){pdf.save(fn)}
     }else{
-      // Preset mode: use pre-selected folders
-      if(saveDirHandle){
-        try{
-          var fileHandle=await saveDirHandle.getFileHandle(fn,{create:true});
-          var writable=await fileHandle.createWritable();
-          await writable.write(pdfBlob);
-          await writable.close();
-        }catch(e){pdf.save(fn)}
-      }else{
-        pdf.save(fn);
-      }
-      showToast(t('pdfOk')+fn);
-      await saveJsonFile(fn);
+      pdf.save(fn);
     }
+    showToast(t('pdfOk')+fn);
+    // Also save JSON for re-editing
+    await saveJsonFile(fn);
   }catch(e){
     // Restore textareas if swap happened
     if(taSwaps&&taSwaps.length){
@@ -2268,7 +2171,6 @@ document.addEventListener('DOMContentLoaded',function(){
     document.getElementById('folderPickerUnsupported').style.display='block';
   }
   updateOrientationButtons();
-  updateSaveModeButtons();
   // Set today's date only if no saved date
   if(!document.getElementById('reportDate').value){
     document.getElementById('reportDate').value=new Date().toISOString().slice(0,10);
