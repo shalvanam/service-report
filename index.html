@@ -1017,17 +1017,30 @@ async function saveFileWithPicker(blob,suggestedName,pickerId){
   try{
     var ext=suggestedName.split('.').pop().toLowerCase();
     var types=[];
+    var startDir=null;
     if(ext==='pdf'){
       types=[{description:'PDF Document',accept:{'application/pdf':['.pdf']}}];
+      if(saveDirHandle) startDir=saveDirHandle;
     }else if(ext==='json'){
       types=[{description:'JSON File',accept:{'application/json':['.json']}}];
+      if(jsonDirHandle) startDir=jsonDirHandle;
     }
     var opts={
       suggestedName:suggestedName,
       types:types,
       id:pickerId||'default'
     };
+    // Pass directory handle as startIn to open picker in the right folder
+    if(startDir){
+      opts.startIn=startDir;
+    }else{
+      opts.startIn='documents';
+    }
     var fh=await window.showSaveFilePicker(opts);
+    // Remember the parent directory for next time
+    if(ext==='pdf'&&!saveDirHandle){
+      // Try to get parent directory from saved file
+    }
     var w=await fh.createWritable();
     await w.write(blob);
     await w.close();
