@@ -1034,10 +1034,28 @@ async function saveJsonFile(fileName){
 }
 
 function downloadBlob(blob,name){
+  // Try modern approach first
+  if(navigator.share&&blob.size>0){
+    try{
+      var file=new File([blob],name,{type:blob.type});
+      navigator.share({files:[file]}).catch(function(){fallbackDownload(blob,name)});
+      return;
+    }catch(e){}
+  }
+  fallbackDownload(blob,name);
+}
+
+function fallbackDownload(blob,name){
   var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=name;a.click();
-  URL.revokeObjectURL(a.href);
+  var url=URL.createObjectURL(blob);
+  a.href=url;
+  a.download=name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },100);
 }
 
 /* ═══════════════════════════════════════════
