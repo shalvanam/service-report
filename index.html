@@ -2128,17 +2128,58 @@ async function savePDF(){
     var dt=document.getElementById('reportDate').value||new Date().toISOString().slice(0,10);
     var fn=cust+'_'+num+'_'+dt+'.pdf';
     var pdfBlob=pdf.output('blob');
-    if(saveMode==='ask'&&window.showSaveFilePicker){
-      // Ask mode: show file picker for each file
-      var savedName=await saveFileWithPicker(pdfBlob,fn,'spectro-pdf');
-      if(savedName) showToast(t('pdfOk')+savedName);
-      // Save JSON with its own picker
+    if(saveMode==='ask'){
+      // Ask mode: if no parent folder yet, ask user to pick one
+      if(!parentDirHandle&&window.showDirectoryPicker){
+        try{
+          showToast(lang==='he'?'בחר תיקייה ראשית — תיקיות PDF ו-JSON ייווצרו אוטומטית':'Choose main folder — PDF and JSON subfolders will be created automatically',4000);
+          parentDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+          saveDirHandle=await parentDirHandle.getDirectoryHandle('PDF',{create:true});
+          jsonDirHandle=await parentDirHandle.getDirectoryHandle('JSON',{create:true});
+          // Update menu display
+          document.getElementById('pathName').textContent=parentDirHandle.name+'/PDF';
+          document.getElementById('pathDisplay').style.display='block';
+          document.getElementById('jsonPathName').textContent=parentDirHandle.name+'/JSON';
+          document.getElementById('jsonPathDisplay').style.display='block';
+        }catch(e){
+          if(e.name==='AbortError'){showToast(lang==='he'?'השמירה בוטלה':'Save cancelled');return;}
+          // Fallback to download
+          pdf.save(fn);
+          showToast(t('pdfOk')+fn);
+          await saveJsonFile(fn);
+          return;
+        }
+      }
+      // Save directly to subfolders
+      if(saveDirHandle){
+        try{
+          var fh=await saveDirHandle.getFileHandle(fn,{create:true});
+          var w=await fh.createWritable();
+          await w.write(pdfBlob);
+          await w.close();
+          showToast(t('pdfOk')+fn);
+        }catch(e){pdf.save(fn);showToast(t('pdfOk')+fn);}
+      }else{
+        pdf.save(fn);
+        showToast(t('pdfOk')+fn);
+      }
+      // Save JSON
       var jsonData=collectFormData();
       var jsonStr=JSON.stringify(jsonData,null,2);
       var jsonName=fn.replace('.pdf','.json');
-      var jsonBlob=new Blob([jsonStr],{type:'application/json'});
-      var savedJson=await saveFileWithPicker(jsonBlob,jsonName,'spectro-json');
-      if(savedJson) showToast(t('jsonSaved')+savedJson);
+      if(jsonDirHandle){
+        try{
+          var jfh=await jsonDirHandle.getFileHandle(jsonName,{create:true});
+          var jw=await jfh.createWritable();
+          await jw.write(jsonStr);
+          await jw.close();
+          showToast(t('jsonSaved')+jsonName);
+        }catch(e){
+          downloadBlob(new Blob([jsonStr],{type:'application/json'}),jsonName);
+        }
+      }else{
+        downloadBlob(new Blob([jsonStr],{type:'application/json'}),jsonName);
+      }
     }else{
       // Preset mode: use pre-selected folders
       if(saveDirHandle){
