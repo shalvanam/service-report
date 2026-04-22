@@ -1001,35 +1001,17 @@ async function saveFileWithPicker(blob,suggestedName,pickerId){
     var startDir=null;
     if(ext==='pdf'){
       types=[{description:'PDF Document',accept:{'application/pdf':['.pdf']}}];
-      // Try PDF subfolder first, then parent folder
       if(saveDirHandle) startDir=saveDirHandle;
-      else if(parentDirHandle){
-        try{
-          saveDirHandle=await parentDirHandle.getDirectoryHandle('PDF',{create:true});
-          startDir=saveDirHandle;
-        }catch(e){}
-      }
     }else if(ext==='json'){
       types=[{description:'JSON File',accept:{'application/json':['.json']}}];
-      // Try JSON subfolder first, then parent folder
       if(jsonDirHandle) startDir=jsonDirHandle;
-      else if(parentDirHandle){
-        try{
-          jsonDirHandle=await parentDirHandle.getDirectoryHandle('JSON',{create:true});
-          startDir=jsonDirHandle;
-        }catch(e){}
-      }
     }
     var opts={
       suggestedName:suggestedName,
       types:types,
       id:pickerId||'default'
     };
-    if(startDir){
-      opts.startIn=startDir;
-    }else{
-      opts.startIn='documents';
-    }
+    if(startDir) opts.startIn=startDir;
     var fh=await window.showSaveFilePicker(opts);
     var w=await fh.createWritable();
     await w.write(blob);
@@ -2128,8 +2110,25 @@ async function savePDF(){
     var dt=document.getElementById('reportDate').value||new Date().toISOString().slice(0,10);
     var fn=cust+'_'+num+'_'+dt+'.pdf';
     var pdfBlob=pdf.output('blob');
+    // If no folder set yet, prompt user to pick one now
+    if(!saveDirHandle&&window.showDirectoryPicker){
+      try{
+        parentDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+        saveDirHandle=await parentDirHandle.getDirectoryHandle('PDF',{create:true});
+        jsonDirHandle=await parentDirHandle.getDirectoryHandle('JSON',{create:true});
+        // Update menu display
+        document.getElementById('pathName').textContent=parentDirHandle.name+'/PDF';
+        document.getElementById('pathDisplay').style.display='block';
+        document.getElementById('jsonPathName').textContent=parentDirHandle.name+'/JSON';
+        document.getElementById('jsonPathDisplay').style.display='block';
+      }catch(e){
+        if(e.name==='AbortError'){
+          // User cancelled — still save to downloads
+        }
+      }
+    }
     if(saveMode==='ask'&&window.showSaveFilePicker){
-      // Ask mode: show file picker for each file
+      // Ask mode: always show file picker for approval
       var savedName=await saveFileWithPicker(pdfBlob,fn,'spectro-pdf');
       if(savedName) showToast(t('pdfOk')+savedName);
       // Save JSON with its own picker
@@ -2140,7 +2139,7 @@ async function savePDF(){
       var savedJson=await saveFileWithPicker(jsonBlob,jsonName,'spectro-json');
       if(savedJson) showToast(t('jsonSaved')+savedJson);
     }else{
-      // Preset mode: use pre-selected folders
+      // Preset mode: save directly to folders
       if(saveDirHandle){
         try{
           var fileHandle=await saveDirHandle.getFileHandle(fn,{create:true});
