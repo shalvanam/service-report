@@ -339,16 +339,22 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
     <div class="menu-body" style="display:none">
       <div class="config-section">
         <div id="folderPickerSupported">
-          <label id="pathLabel">בחר תיקייה ראשית (תיקיות PDF ו-JSON ייווצרו אוטומטית)</label>
+          <label id="pathLabel">בחר תיקייה לשמירת קבצי PDF</label>
           <div style="display:flex;gap:8px;align-items:center">
             <button class="cbtn" onclick="chooseSavePath()" id="pathBtn" style="width:auto;flex-shrink:0">📂 <span data-t="choosePath">בחר תיקייה</span></button>
           </div>
           <div id="pathDisplay" style="margin-top:8px;font-size:11px;color:var(--s5);word-break:break-all;display:none">
-            <span>📁 PDF: </span><span id="pathName"></span>
+            <span>📁 </span><span id="pathName"></span>
+            <button onclick="clearSavePath()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;margin-right:8px">✕</button>
           </div>
-          <div id="jsonPathDisplay" style="margin-top:4px;font-size:11px;color:var(--s5);word-break:break-all;display:none">
-            <span>📁 JSON: </span><span id="jsonPathName"></span>
-            <button onclick="clearSavePath()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;margin-right:8px">✕ נקה</button>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--s2)"></div>
+          <label id="jsonPathLabel">בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+            <button class="cbtn" onclick="chooseJsonPath()" id="jsonPathBtn" style="width:auto;flex-shrink:0">📂 <span data-t="chooseJsonPath">בחר תיקייה</span></button>
+          </div>
+          <div id="jsonPathDisplay" style="margin-top:8px;font-size:11px;color:var(--s5);word-break:break-all;display:none">
+            <span>📁 </span><span id="jsonPathName"></span>
+            <button onclick="clearJsonPath()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;margin-right:8px">✕</button>
           </div>
         </div>
         <div id="folderPickerUnsupported" style="display:none;text-align:center;padding:10px 0">
@@ -623,7 +629,7 @@ var T = {
     sendNoSupport:'שיתוף קבצים לא נתמך בדפדפן זה — נסה מהטלפון',
     connectFirst:'יש להתחבר קודם',newOk:'📄 דוח חדש מס׳ ',newErr:'❌ שגיאה ביצירת דוח',
     disconnected:'נותק מ-Google Sheet',
-    menuPathTitle:'תיקיית שמירה',pathLabel:'בחר תיקייה ראשית (תיקיות PDF ו-JSON ייווצרו אוטומטית)',choosePath:'בחר תיקייה',
+    menuPathTitle:'תיקיית שמירה',pathLabel:'בחר תיקייה לשמירת קבצי PDF',choosePath:'בחר תיקייה',
     pathSet:'✅ תיקייה נבחרה: ',pathErr:'❌ הדפדפן לא תומך בבחירת תיקייה',pathCleared:'תיקייה הוסרה',
     menuMailTitle:'נמענים',mailLabel:'כתובות מייל לשליחת דוחות',mailAdded:'✅ נמען נוסף',mailRemoved:'נמען הוסר',mailInvalid:'כתובת מייל לא תקינה',
     jsonPathLabel:'בחר תיקייה לשמירת קבצי JSON (גיבוי לעריכה)',chooseJsonPath:'בחר תיקייה',jsonPathSet:'✅ תיקיית JSON נבחרה: ',jsonPathCleared:'תיקיית JSON הוסרה',unsupportedFolder:'הקבצים יישמרו אוטומטית בתיקיית ההורדות של המכשיר',
@@ -656,7 +662,7 @@ var T = {
     sendNoSupport:'File sharing not supported — try from your phone',
     connectFirst:'Connect first',newOk:'📄 New report #',newErr:'❌ Error creating report',
     disconnected:'Disconnected from Google Sheet',
-    menuPathTitle:'Save Folder',pathLabel:'Choose main folder (PDF and JSON subfolders created automatically)',choosePath:'Choose Folder',
+    menuPathTitle:'Save Folder',pathLabel:'Choose folder for saving PDF files',choosePath:'Choose Folder',
     pathSet:'✅ Folder selected: ',pathErr:'❌ Browser does not support folder selection',pathCleared:'Folder removed',
     menuMailTitle:'Mail Recipients',mailLabel:'Email addresses for sending reports',mailAdded:'✅ Recipient added',mailRemoved:'Recipient removed',mailInvalid:'Invalid email address',
     jsonPathLabel:'Choose folder for JSON files (backup for editing)',chooseJsonPath:'Choose Folder',jsonPathSet:'✅ JSON folder selected: ',jsonPathCleared:'JSON folder removed',unsupportedFolder:'Files will be saved automatically to your device Downloads folder',
@@ -687,6 +693,7 @@ function applyLang(l){
   document.getElementById('pathLabel').textContent=T[l].pathLabel;
   document.getElementById('menuMailTitle').innerHTML=T[l].menuMailTitle+' <span class="arrow">▾</span>';
   document.getElementById('mailLabel').textContent=T[l].mailLabel;
+  document.getElementById('jsonPathLabel').textContent=T[l].jsonPathLabel;
   document.getElementById('unsupportedMsg').textContent=T[l].unsupportedFolder;
   document.getElementById('orientationLabel').textContent=T[l].orientationLabel;
   document.getElementById('saveModeLabel').textContent=T[l].saveModeLabel;
@@ -839,23 +846,16 @@ var counterVal=0;
    Save Path (File System Access API)
    ═══════════════════════════════════════════ */
 var saveDirHandle=null;
-var jsonDirHandle=null;
-var parentDirHandle=null;
 
 async function chooseSavePath(){
   if(!window.showDirectoryPicker){
     showToast(t('pathErr'));return;
   }
   try{
-    parentDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
-    // Auto-create PDF and JSON subfolders
-    saveDirHandle=await parentDirHandle.getDirectoryHandle('PDF',{create:true});
-    jsonDirHandle=await parentDirHandle.getDirectoryHandle('JSON',{create:true});
-    document.getElementById('pathName').textContent=parentDirHandle.name+'/PDF';
+    saveDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+    document.getElementById('pathName').textContent=saveDirHandle.name;
     document.getElementById('pathDisplay').style.display='block';
-    document.getElementById('jsonPathName').textContent=parentDirHandle.name+'/JSON';
-    document.getElementById('jsonPathDisplay').style.display='block';
-    showToast(t('pathSet')+parentDirHandle.name+' (PDF + JSON)');
+    showToast(t('pathSet')+saveDirHandle.name);
   }catch(e){
     if(e.name!=='AbortError') showToast(t('pathErr'));
   }
@@ -863,12 +863,8 @@ async function chooseSavePath(){
 
 function clearSavePath(){
   saveDirHandle=null;
-  jsonDirHandle=null;
-  parentDirHandle=null;
   document.getElementById('pathDisplay').style.display='none';
   document.getElementById('pathName').textContent='';
-  document.getElementById('jsonPathDisplay').style.display='none';
-  document.getElementById('jsonPathName').textContent='';
   showToast(t('pathCleared'));
 }
 
@@ -917,6 +913,29 @@ function removeMailRecipient(i){
 /* ═══════════════════════════════════════════
    JSON Save Folder
    ═══════════════════════════════════════════ */
+var jsonDirHandle=null;
+
+async function chooseJsonPath(){
+  if(!window.showDirectoryPicker){
+    showToast(t('pathErr'));return;
+  }
+  try{
+    jsonDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+    document.getElementById('jsonPathName').textContent=jsonDirHandle.name;
+    document.getElementById('jsonPathDisplay').style.display='block';
+    showToast(t('jsonPathSet')+jsonDirHandle.name);
+  }catch(e){
+    if(e.name!=='AbortError') showToast(t('pathErr'));
+  }
+}
+
+function clearJsonPath(){
+  jsonDirHandle=null;
+  document.getElementById('jsonPathDisplay').style.display='none';
+  document.getElementById('jsonPathName').textContent='';
+  showToast(t('jsonPathCleared'));
+}
+
 /* ═══════════════════════════════════════════
    PDF Orientation Setting
    ═══════════════════════════════════════════ */
@@ -998,38 +1017,16 @@ async function saveFileWithPicker(blob,suggestedName,pickerId){
   try{
     var ext=suggestedName.split('.').pop().toLowerCase();
     var types=[];
-    var startDir=null;
     if(ext==='pdf'){
       types=[{description:'PDF Document',accept:{'application/pdf':['.pdf']}}];
-      // Try PDF subfolder first, then parent folder
-      if(saveDirHandle) startDir=saveDirHandle;
-      else if(parentDirHandle){
-        try{
-          saveDirHandle=await parentDirHandle.getDirectoryHandle('PDF',{create:true});
-          startDir=saveDirHandle;
-        }catch(e){}
-      }
     }else if(ext==='json'){
       types=[{description:'JSON File',accept:{'application/json':['.json']}}];
-      // Try JSON subfolder first, then parent folder
-      if(jsonDirHandle) startDir=jsonDirHandle;
-      else if(parentDirHandle){
-        try{
-          jsonDirHandle=await parentDirHandle.getDirectoryHandle('JSON',{create:true});
-          startDir=jsonDirHandle;
-        }catch(e){}
-      }
     }
     var opts={
       suggestedName:suggestedName,
       types:types,
       id:pickerId||'default'
     };
-    if(startDir){
-      opts.startIn=startDir;
-    }else{
-      opts.startIn='documents';
-    }
     var fh=await window.showSaveFilePicker(opts);
     var w=await fh.createWritable();
     await w.write(blob);
