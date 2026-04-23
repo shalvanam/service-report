@@ -1934,6 +1934,23 @@ function escAttr(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&qu
    ═══════════════════════════════════════════ */
 async function savePDF(){
   if(!validateForm()) return;
+  // In ask mode, if no folder set yet, prompt to pick parent folder only (don't save yet)
+  if(saveMode==='ask'&&!parentDirHandle&&window.showDirectoryPicker){
+    try{
+      parentDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+      saveDirHandle=await parentDirHandle.getDirectoryHandle('PDF',{create:true});
+      jsonDirHandle=await parentDirHandle.getDirectoryHandle('JSON',{create:true});
+      // Update menu display
+      document.getElementById('pathName').textContent=parentDirHandle.name+'/PDF';
+      document.getElementById('pathDisplay').style.display='block';
+      document.getElementById('jsonPathName').textContent=parentDirHandle.name+'/JSON';
+      document.getElementById('jsonPathDisplay').style.display='block';
+      showToast(lang==='he'?'✅ תיקייה נבחרה — לחץ שמור שוב':'✅ Folder set — press Save again');
+    }catch(e){
+      showToast(lang==='he'?'לא נבחרה תיקייה':'No folder selected');
+    }
+    return;
+  }
   // Save factory name for autocomplete
   saveFactoryName(document.getElementById('factoryName').value.trim());
   showToast(t('pdfGen'));
@@ -2110,25 +2127,8 @@ async function savePDF(){
     var dt=document.getElementById('reportDate').value||new Date().toISOString().slice(0,10);
     var fn=cust+'_'+num+'_'+dt+'.pdf';
     var pdfBlob=pdf.output('blob');
-    // If no folder set yet, prompt user to pick one now
-    if(!saveDirHandle&&window.showDirectoryPicker){
-      try{
-        parentDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
-        saveDirHandle=await parentDirHandle.getDirectoryHandle('PDF',{create:true});
-        jsonDirHandle=await parentDirHandle.getDirectoryHandle('JSON',{create:true});
-        // Update menu display
-        document.getElementById('pathName').textContent=parentDirHandle.name+'/PDF';
-        document.getElementById('pathDisplay').style.display='block';
-        document.getElementById('jsonPathName').textContent=parentDirHandle.name+'/JSON';
-        document.getElementById('jsonPathDisplay').style.display='block';
-      }catch(e){
-        if(e.name==='AbortError'){
-          // User cancelled — still save to downloads
-        }
-      }
-    }
     if(saveMode==='ask'&&window.showSaveFilePicker){
-      // Ask mode: always show file picker for approval
+      // Ask mode: show file picker for each file
       var savedName=await saveFileWithPicker(pdfBlob,fn,'spectro-pdf');
       if(savedName) showToast(t('pdfOk')+savedName);
       // Save JSON with its own picker
