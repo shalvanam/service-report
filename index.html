@@ -257,13 +257,18 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
 .hidden{display:none!important}
 
 @media print{
+  @page{margin:5mm;size:A4}
+  body{background:white;transform-origin:top center;font-size:90%}
+  .wrap{margin:0;padding:0}
   .bar{position:static;box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact}
   .bar .btns,.sync,.abtn,.aibtn,.rbtn,.scl,.wl-rm,.menu-toggle,.photo-del,.photo-empty,.storage-bar,.storage-info,.sig-color-btn,.sig-expand,.photo-hd,.photo-quality-toggle{display:none!important}
   .menu-panel,.menu-overlay{display:none!important}
-  body{background:white}.wrap{margin:0;padding:0}
   .cd,.rnum{box-shadow:none}
   .fg input,.fg textarea,.wl textarea,.itbl tbody td input{border-color:transparent;background:transparent;padding:3px 0}
   .sbox{border-style:solid}
+  .cd{padding:8px!important}
+  .fg{margin-bottom:4px!important}
+  .sbox{height:60px!important}
 }
 
 /* ══ LOGIN SCREEN ══ */
@@ -495,7 +500,7 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
   <div class="cd">
     <div class="ct" data-t="sec3">③ תיאור העבודה</div>
     <div class="fr s1">
-      <div class="fg"><label data-t="workSubject">נושא כללי</label><textarea id="workSubject" rows="1" oninput="autoGrow(this)"></textarea></div>
+      <div class="fg"><label data-t="workSubject">סיבת ביקור:</label><textarea id="workSubject" rows="1" oninput="autoGrow(this)"></textarea></div>
     </div>
     <div class="wls" id="workLines">
       <div class="wl">
@@ -630,7 +635,7 @@ var T = {
     sec1:'① פרטים כלליים',factoryName:'שם המפעל',contactName:'שם איש הקשר',date:'תאריך',
     callType:'סוג קריאה',periodic:'תקופתי',phoneCall:'קריאה טלפונית',serviceAgreement:'הסכם שירות',
     oneTime:'חד פעמית',sec2:'② פרטי המכשיר',deviceType:'סוג המכשיר',manufacturer:'יצרן',
-    serialNum:'מס׳ סידורי',sec3:'③ תיאור העבודה',workSubject:'נושא כללי',addRow:'+ הוסף שורה',
+    serialNum:'מס׳ סידורי',sec3:'③ תיאור העבודה',workSubject:'סיבת ביקור:',workActions:'פעולות שבוצעו:',addRow:'+ הוסף שורה',
     sec4:'④ הערות והמלצות',sec5:'⑤ פריטים',item:'פריט',sku:'מק״ט',qty:'כמות',
     addItem:'+ הוסף פריט',sec6:'⑥ סיכום ביצוע',techName:'שם מבצע השירות',startTime:'שעת התחלה',
     endTime:'שעת סיום',travelHours:'שעות נסיעה',travelKm:'ק״מ נסיעה',signatures:'חתימות',
@@ -653,7 +658,7 @@ var T = {
     orientationLabel:'כיוון PDF',portrait:'📄 לאורך',landscape:'📄 לרוחב',rotate:'סובב',sigColor:'צבע חתימה:',
     saveModeLabel:'אופן שמירה',savePreset:'📂 תיקייה קבועה',saveAsk:'💾 בחר כל פעם',
     menuLoadTitle:'טעינת דוח',loadLabel:'טען קובץ JSON לעריכה מחדש',loadReport:'טען דוח',loadOk:'✅ דוח נטען בהצלחה',loadErr:'❌ שגיאה בטעינת הקובץ',jsonSaved:'💾 JSON נשמר: ',
-    darkMode:'🌙 מצב לילה',workHours:'⏱ סה״כ שעות עבודה: ',validationErr:'נא למלא את השדות המסומנים',totalHrsMin:' שעות ו-',
+    darkMode:'🌙 מצב לילה',workHours:'⏱ סה״כ שעות עבודה: ',validationErr:'נא למלא את השדות המסומנים',totalHrsMin:" \u05E9' \u05D5-",
     camera:'צלם',secPhotos:'📷 תמונות',addPhoto:'לחץ לצילום או בחירת תמונה',takePhoto:'📷 צלם תמונה',fromGallery:'🖼 בחר מגלריה',photosRemain:'ניתן לצלם עוד: ~',photoDeleted:'תמונה נמחקה',photoAdded:'📷 תמונה נוספה',storageFull:'⚠️ הזיכרון מלא — שמור את הדוח לפני הוספת תמונות',
     qualityLabel:'איכות:',qualityLow:'📷 דחוס',qualityHigh:'📷 HD',qualityChanged:'איכות תמונות שונתה',photoUpgraded:'📷 תמונה שודרגה ל-HD',photoDowngraded:'📷 תמונה הוחזרה לדחוס',
     confirmClear:'האם אתה בטוח שברצונך לנקות את הטופס? כל הנתונים יימחקו.',confirmNew:'האם אתה בטוח שברצונך ליצור דוח חדש? נתונים שלא נשמרו יאבדו.',pdfGeneratedAt:'נוצר בתאריך: ',pdfGeneratedBy:'מבצע: '
@@ -664,7 +669,7 @@ var T = {
     sec1:'① General Details',factoryName:'Factory Name',contactName:'Contact Person',date:'Date',
     callType:'Call Type',periodic:'Periodic',phoneCall:'Phone Call',serviceAgreement:'Service Agreement',
     oneTime:'One-time',sec2:'② Device Details',deviceType:'Device Type',manufacturer:'Manufacturer',
-    serialNum:'Serial #',sec3:'③ Work Description',workSubject:'General Subject',addRow:'+ Add Row',
+    serialNum:'Serial #',sec3:'③ Work Description',workSubject:'Visit Reason:',workActions:'Actions Performed:',addRow:'+ Add Row',
     sec4:'④ Notes & Recommendations',sec5:'⑤ Items',item:'Item',sku:'SKU',qty:'Qty',
     addItem:'+ Add Item',sec6:'⑥ Execution Summary',techName:'Service Technician',startTime:'Start Time',
     endTime:'End Time',travelHours:'Travel Hours',travelKm:'Travel Km',signatures:'Signatures',
@@ -792,7 +797,7 @@ function calcWorkHours(){
   var hrs=Math.floor(diff/60);
   var mins=diff%60;
   display.style.display='block';
-  display.textContent=t('workHours')+hrs+t('totalHrsMin')+mins+(lang==='he'?' דקות':' min');
+  display.textContent=t('workHours')+hrs+t('totalHrsMin')+mins+(lang==='he'?" \u05D3\u05E7'":" min");
   saveFormData();
 }
 
@@ -1109,15 +1114,17 @@ async function saveJsonFile(fileName){
 }
 
 function downloadBlob(blob,name){
-  // Try modern approach first
-  if(navigator.share&&blob.size>0){
-    try{
-      var file=new File([blob],name,{type:blob.type});
-      navigator.share({files:[file]}).catch(function(){fallbackDownload(blob,name)});
-      return;
-    }catch(e){}
-  }
-  fallbackDownload(blob,name);
+  // Direct download — no share sheet
+  var a=document.createElement('a');
+  var url=URL.createObjectURL(blob);
+  a.href=url;
+  a.download=name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },100);
 }
 
 function fallbackDownload(blob,name){
@@ -1604,15 +1611,34 @@ function initSig(cid){
   var ctx=cvs.getContext('2d');
   var drawing=false,has=false,lastPt=null;
   var dpr=window.devicePixelRatio||1;
+  var sigKey='spectro_sig_data_'+cvs.id;
   function resize(){
     var r=box.getBoundingClientRect();
+    // Save before resize
+    var savedData=null;
+    try{savedData=localStorage.getItem(sigKey)}catch(e){}
     cvs.width=r.width*dpr;
     cvs.height=r.height*dpr;
     cvs.style.width=r.width+'px';
     cvs.style.height=r.height+'px';
     ctx.scale(dpr,dpr);
+    // Restore after resize
+    if(savedData){
+      var img=new Image();
+      img.onload=function(){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(img,0,0,cvs.width,cvs.height);ctx.restore();has=true;box.classList.add('has')};
+      img.src=savedData;
+    }
   }
   resize();window.addEventListener('resize',resize);
+  // Restore on init
+  try{
+    var saved=localStorage.getItem(sigKey);
+    if(saved){
+      var img=new Image();
+      img.onload=function(){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(img,0,0,cvs.width,cvs.height);ctx.restore();has=true;box.classList.add('has')};
+      img.src=saved;
+    }
+  }catch(e){}
   function pos(e){var r=cvs.getBoundingClientRect();var t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top}}
   function start(e){e.preventDefault();drawing=true;lastPt=pos(e);ctx.beginPath();ctx.moveTo(lastPt.x,lastPt.y)}
   function move(e){
@@ -1627,13 +1653,17 @@ function initSig(cid){
     lastPt=p;
     if(!has){has=true;box.classList.add('has')}
   }
-  function stop(){drawing=false;lastPt=null}
+  function stop(){
+    drawing=false;lastPt=null;
+    // Auto-save signature to localStorage on every stroke end
+    if(has){try{localStorage.setItem(sigKey,cvs.toDataURL('image/png'))}catch(e){}}
+  }
   cvs.addEventListener('mousedown',start);cvs.addEventListener('mousemove',move);
   cvs.addEventListener('mouseup',stop);cvs.addEventListener('mouseleave',stop);
   cvs.addEventListener('touchstart',start,{passive:false});
   cvs.addEventListener('touchmove',move,{passive:false});
   cvs.addEventListener('touchend',stop);
-  box._clear=function(){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,cvs.width,cvs.height);has=false;box.classList.remove('has')};
+  box._clear=function(){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,cvs.width,cvs.height);has=false;box.classList.remove('has');try{localStorage.removeItem(sigKey)}catch(e){}};
 }
 function clearSig(id){document.getElementById(id)._clear()}
 
@@ -1801,6 +1831,8 @@ function openSigFullscreen(sigId){
       origCtx.drawImage(fsCanvas,0,0,oh,ow);
       origCtx.restore();
       box.classList.add('has');
+      // Auto-save to localStorage
+      try{localStorage.setItem('spectro_sig_data_'+origCanvas.id,origCanvas.toDataURL('image/png'))}catch(e){}
       closeOverlay();
       saveFormData();
       showToast(lang==='he'?'✅ חתימה נשמרה':'✅ Signature saved');
@@ -2428,13 +2460,28 @@ async function savePDF(){
       // Ask mode: show file picker for each file
       var savedName=await saveFileWithPicker(pdfBlob,fn,'spectro-pdf');
       if(savedName) showToast(t('pdfOk')+savedName);
-      // Save JSON with its own picker
+      // Bridge: prompt user before JSON save to create fresh user gesture
       var jsonData=collectFormData();
       var jsonStr=JSON.stringify(jsonData,null,2);
       var jsonName=fn.replace('.pdf','.json');
       var jsonBlob=new Blob([jsonStr],{type:'application/json'});
-      var savedJson=await saveFileWithPicker(jsonBlob,jsonName,'spectro-json');
-      if(savedJson) showToast(t('jsonSaved')+savedJson);
+      var doJson=await new Promise(function(resolve){
+        var d=document.createElement('div');
+        d.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99999;display:flex;align-items:center;justify-content:center';
+        d.innerHTML='<div style="background:#fff;border-radius:12px;padding:24px;max-width:320px;text-align:center;font-family:Rubik,sans-serif">'
+          +'<div style="font-size:15px;margin-bottom:16px;color:#334155">'+(lang==='he'?'PDF נשמר בהצלחה ✅<br>לשמור גם קובץ JSON לגיבוי?':'PDF saved ✅<br>Save JSON backup file too?')+'</div>'
+          +'<div style="display:flex;gap:10px;justify-content:center">'
+          +'<button id="jsonYes" style="background:#10B981;color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:14px;cursor:pointer;font-family:Rubik,sans-serif">'+(lang==='he'?'💾 שמור JSON':'💾 Save JSON')+'</button>'
+          +'<button id="jsonNo" style="background:#E5E7EB;color:#334155;border:none;padding:8px 20px;border-radius:8px;font-size:14px;cursor:pointer;font-family:Rubik,sans-serif">'+(lang==='he'?'דלג':'Skip')+'</button>'
+          +'</div></div>';
+        document.body.appendChild(d);
+        d.querySelector('#jsonYes').onclick=function(){document.body.removeChild(d);resolve(true)};
+        d.querySelector('#jsonNo').onclick=function(){document.body.removeChild(d);resolve(false)};
+      });
+      if(doJson){
+        var savedJson=await saveFileWithPicker(jsonBlob,jsonName,'spectro-json');
+        if(savedJson) showToast(t('jsonSaved')+savedJson);
+      }
     }else{
       // Preset mode: save directly to folders
       if(saveDirHandle){
@@ -2734,11 +2781,12 @@ function hybridDrawField(pdf,label,value,x,y,w,fieldH){
   if(value){
     hybridTextRight(pdf,value,x-4,y+fieldH-3,w-8);
   }
-  return y+fieldH+8;
+  return y+fieldH+4;
 }
 
-function hybridCheckNeeded(pdf,y,needed,pdfH,margin){
-  if(y+needed>pdfH-margin){
+function hybridCheckNeeded(pdf,y,needed,pdfH,margin,mBottom){
+  var mb=mBottom||margin;
+  if(y+needed>pdfH-mb){
     pdf.addPage();
     return margin+5;
   }
@@ -2779,6 +2827,7 @@ async function saveHybridPDF(){
     var pdfW=isLandscape?297:210;
     var pdfH=isLandscape?210:297;
     var margin=10;
+    var marginBottom=15; // extra bottom margin for printer safety
     var contentW=pdfW-margin*2;
     var rightX=pdfW-margin;
     var y=margin;
@@ -2811,7 +2860,7 @@ async function saveHybridPDF(){
     pdf.setTextColor(0);
     pdf.setLineWidth(0.3);
 
-    y+=26;
+    y+=22;
 
     // Red separator line
     pdf.setDrawColor(180,28,28);
@@ -2833,135 +2882,142 @@ async function saveHybridPDF(){
     pdf.text(infoRight,rightX-pdf.getTextWidth(infoRight),y+3);
     pdf.text(infoLeft,margin,y+3);
     pdf.setTextColor(0);
-    y+=10;
+    y+=7;
 
     var fieldH=10;
     var halfW=isLandscape?(contentW/2-5):(contentW);
 
     function drawSectionHeader(title){
-      y=hybridCheckNeeded(pdf,y,20,pdfH,margin);
+      y=hybridCheckNeeded(pdf,y,14,pdfH,margin,marginBottom);
       pdf.setFont('DejaVu','bold');
-      pdf.setFontSize(12);
+      pdf.setFontSize(11);
       pdf.setTextColor(180,28,28);
-      hybridTextRight(pdf,title,rightX,y+4,contentW);
-      y+=7;
+      hybridTextRight(pdf,title,rightX,y+3,contentW);
+      y+=6;
       pdf.setDrawColor(180,28,28);
       pdf.setLineWidth(0.5);
       pdf.line(margin,y,rightX,y);
       pdf.setLineWidth(0.3);
       pdf.setTextColor(0);
-      y+=6;
+      y+=5;
     }
 
     // ── ① GENERAL DETAILS + ② DEVICE DETAILS ──
-    if(isLandscape){
-      // Side by side
-      var col1X=rightX;
-      var col2X=rightX-halfW-10;
+    drawSectionHeader('① '+t('sec1')+' / '+'② '+t('sec2'));
 
-      drawSectionHeader('① '+t('sec1')+' / '+'② '+t('sec2'));
-
-      var yStart=y;
-      // Col 1: General Details
-      pdf.setFont('DejaVu','bold');pdf.setFontSize(9);
-      y=hybridDrawField(pdf,t('factoryName'),document.getElementById('factoryName').value,col1X,y,halfW,fieldH);
-      y=hybridDrawField(pdf,t('contactName'),document.getElementById('contactName').value,col1X,y,halfW,fieldH);
-      y=hybridDrawField(pdf,t('date'),document.getElementById('reportDate').value,col1X,y,halfW,fieldH);
-      var y1=y;
-
-      // Col 2: Device Details
-      y=yStart;
-      y=hybridDrawField(pdf,t('deviceType'),document.getElementById('deviceType').value,col2X,y,halfW,fieldH);
-      y=hybridDrawField(pdf,t('manufacturer'),document.getElementById('manufacturer').value,col2X,y,halfW,fieldH);
-      y=hybridDrawField(pdf,t('serialNum'),document.getElementById('serialNum').value,col2X,y,halfW,fieldH);
-
-      y=Math.max(y1,y);
-
-      // Call type checkboxes
-      y=hybridCheckNeeded(pdf,y,12,pdfH,margin);
-      pdf.setFont('DejaVu','bold');pdf.setFontSize(9);
-      hybridTextRight(pdf,t('callType'),rightX,y,contentW);
-      y+=5;
-      var checks=document.querySelectorAll('input[name="callType"]');
-      var checkX=rightX;
-      checks.forEach(function(cb){
-        var lbl=cb.parentElement.querySelector('span').textContent;
-        var rlbl=bidiReorder(lbl);
-        var tw=pdf.getTextWidth(rlbl)+8;
-        pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
-        pdf.rect(checkX-tw-5,y-3,4,4);
-        if(cb.checked){
-          pdf.setFont('DejaVu','bold');
-          pdf.text('X',checkX-tw-4.3,y+0.3);
-        }
-        pdf.setFont('DejaVu','normal');
-        pdf.text(rlbl,checkX-tw,y);
-        checkX-=tw-2;
-      });
-      y+=10;
-
-    }else{
-      // Portrait: stacked
-      drawSectionHeader('① '+t('sec1'));
-      y=hybridDrawField(pdf,t('factoryName'),document.getElementById('factoryName').value,rightX,y,contentW,fieldH);
-      y=hybridDrawField(pdf,t('contactName'),document.getElementById('contactName').value,rightX,y,contentW,fieldH);
-      y=hybridDrawField(pdf,t('date'),document.getElementById('reportDate').value,rightX,y,contentW,fieldH);
-
-      // Call type
-      y=hybridCheckNeeded(pdf,y,12,pdfH,margin);
-      pdf.setFont('DejaVu','bold');pdf.setFontSize(9);
-      hybridTextRight(pdf,t('callType'),rightX,y,contentW);
-      y+=5;
-      var checks=document.querySelectorAll('input[name="callType"]');
-      var checkX=rightX;
-      checks.forEach(function(cb){
-        var lbl=cb.parentElement.querySelector('span').textContent;
-        var rlbl=bidiReorder(lbl);
-        var tw=pdf.getTextWidth(rlbl)+8;
-        pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
-        pdf.rect(checkX-tw-5,y-3,4,4);
-        if(cb.checked){
-          pdf.setFont('DejaVu','bold');
-          pdf.text('X',checkX-tw-4.3,y+0.3);
-        }
-        pdf.setFont('DejaVu','normal');
-        pdf.text(rlbl,checkX-tw,y);
-        checkX-=tw-2;
-      });
-      y+=10;
-
-      drawSectionHeader('② '+t('sec2'));
-      y=hybridDrawField(pdf,t('deviceType'),document.getElementById('deviceType').value,rightX,y,contentW,fieldH);
-      y=hybridDrawField(pdf,t('manufacturer'),document.getElementById('manufacturer').value,rightX,y,contentW,fieldH);
-      y=hybridDrawField(pdf,t('serialNum'),document.getElementById('serialNum').value,rightX,y,contentW,fieldH);
+    // 4-field grid layout for both orientations
+    var qW=(contentW-12)/4; // 4 columns with 4mm gaps
+    function drawGridField(label,value,col,rowY){
+      var gx=rightX-col*(qW+4);
+      pdf.setFont('DejaVu','bold');pdf.setFontSize(8);
+      hybridTextRight(pdf,label,gx,rowY-2,qW);
+      pdf.setDrawColor(200);pdf.setFillColor(250,250,252);
+      pdf.roundedRect(gx-qW,rowY+1,qW,fieldH,2,2,'FD');
+      pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
+      if(value) hybridTextRight(pdf,value,gx-3,rowY+fieldH-3,qW-6);
     }
+
+    // Row 1: Factory | Contact | Date | Call Type
+    var rowY=y;
+    drawGridField(t('factoryName'),document.getElementById('factoryName').value,0,rowY);
+    drawGridField(t('contactName'),document.getElementById('contactName').value,1,rowY);
+    drawGridField(t('date'),document.getElementById('reportDate').value,2,rowY);
+
+    // Call type in 4th column - checkboxes as text
+    var ctLabel=t('callType');
+    var ctVal='';
+    var checks=document.querySelectorAll('input[name="callType"]');
+    checks.forEach(function(cb){
+      if(cb.checked) ctVal+=(ctVal?', ':'')+cb.parentElement.querySelector('span').textContent;
+    });
+    drawGridField(ctLabel,ctVal||'-',3,rowY);
+    y=rowY+fieldH+8;
+
+    // Row 2: Device Type | Manufacturer | Serial | (empty)
+    rowY=y;
+    drawGridField(t('deviceType'),document.getElementById('deviceType').value,0,rowY);
+    drawGridField(t('manufacturer'),document.getElementById('manufacturer').value,1,rowY);
+    drawGridField(t('serialNum'),document.getElementById('serialNum').value,2,rowY);
+    y=rowY+fieldH+5;
+
+    // ── ⑥ EXECUTION SUMMARY ──
+    drawSectionHeader('⑥ '+t('sec6'));
+    // Single row: Name (wider) | Travel Hours | Start | End | Total Hours | Travel Km
+    var nameW=contentW*0.25;
+    var smallW=(contentW-nameW-20)/5; // 5 small fields + 4mm gaps each
+    rowY=y;
+    // Field 1: Technician name (wider)
+    var gx=rightX;
+    pdf.setFont('DejaVu','bold');pdf.setFontSize(8);
+    hybridTextRight(pdf,t('techName'),gx,rowY-2,nameW);
+    pdf.setDrawColor(200);pdf.setFillColor(250,250,252);
+    pdf.roundedRect(gx-nameW,rowY+1,nameW,fieldH,2,2,'FD');
+    pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
+    var tnVal=document.getElementById('techName').value||'';
+    if(tnVal) hybridTextRight(pdf,tnVal,gx-3,rowY+fieldH-3,nameW-6);
+
+    // Fields 2-6: small equal columns
+    function drawSmallField(label,value,idx){
+      var sx=rightX-nameW-4-idx*(smallW+4);
+      pdf.setFont('DejaVu','bold');pdf.setFontSize(7);
+      hybridTextRight(pdf,label,sx,rowY-2,smallW);
+      pdf.setDrawColor(200);pdf.setFillColor(250,250,252);
+      pdf.roundedRect(sx-smallW,rowY+1,smallW,fieldH,2,2,'FD');
+      pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
+      if(value) hybridTextRight(pdf,value,sx-2,rowY+fieldH-3,smallW-4);
+    }
+    drawSmallField(t('travelHours'),document.getElementById('travelHours').value,0);
+    drawSmallField(t('startTime'),document.getElementById('startTime').value,1);
+    drawSmallField(t('endTime'),document.getElementById('endTime').value,2);
+    // Total work hours
+    var whDisplay=document.getElementById('workHoursDisplay');
+    var whVal='';
+    if(whDisplay&&whDisplay.style.display!=='none'){
+      whVal=whDisplay.textContent.replace(/⏱\s*/,'').replace(/סה.כ שעות עבודה:\s*/,'').replace(/Total work hours:\s*/,'').trim();
+    }
+    drawSmallField(t('workHours')||'סה״כ שעות',whVal,3);
+    drawSmallField(t('travelKm'),document.getElementById('travelKm').value,4);
+    y=rowY+fieldH+5;
 
     // ── ③ WORK DESCRIPTION ──
     drawSectionHeader('③ '+t('sec3'));
     var workSubject=document.getElementById('workSubject').value;
     if(workSubject){
+      // Label and text on same row
       pdf.setFont('DejaVu','bold');pdf.setFontSize(9);
-      hybridTextRight(pdf,t('workSubject'),rightX,y,contentW);
-      y+=5;
+      var wsLabel=bidiReorder(t('workSubject'));
+      var wsLabelW=pdf.getTextWidth(wsLabel)+4;
+      pdf.text(wsLabel,rightX-pdf.getTextWidth(wsLabel),y);
       pdf.setFont('DejaVu','normal');pdf.setFontSize(10);
-      y=hybridTextRightWrap(pdf,workSubject,rightX,y,contentW,5);
-      y+=3;
+      y=hybridTextRightWrap(pdf,workSubject,rightX-wsLabelW,y,contentW-wsLabelW,5);
+      y+=2;
     }
 
     // Work lines
     var workLines=document.querySelectorAll('#workLines .wl textarea');
-    workLines.forEach(function(ta,i){
-      if(!ta.value) return;
-      y=hybridCheckNeeded(pdf,y,15,pdfH,margin);
+    var hasWorkLines=false;
+    workLines.forEach(function(ta){if(ta.value) hasWorkLines=true;});
+    if(hasWorkLines){
+      // "פעולות שבוצעו:" label on same row as first line
       pdf.setFont('DejaVu','bold');pdf.setFontSize(9);
-      pdf.setTextColor(180,28,28);
-      hybridTextRight(pdf,(i+1)+'.',rightX,y,contentW);
-      pdf.setTextColor(0);
-      pdf.setFont('DejaVu','normal');pdf.setFontSize(10);
-      y=hybridTextRightWrap(pdf,ta.value,rightX-8,y,contentW-8,5);
-      y+=3;
-    });
-    y+=3;
+      var waLabel=bidiReorder(t('workActions'));
+      var waLabelW=pdf.getTextWidth(waLabel)+4;
+      pdf.text(waLabel,rightX-pdf.getTextWidth(waLabel),y);
+      var firstLine=true;
+      workLines.forEach(function(ta,i){
+        if(!ta.value) return;
+        y=hybridCheckNeeded(pdf,y,15,pdfH,margin,marginBottom);
+        pdf.setFont('DejaVu','normal');pdf.setFontSize(10);
+        if(firstLine){
+          y=hybridTextRightWrap(pdf,ta.value,rightX-waLabelW,y,contentW-waLabelW,5);
+          firstLine=false;
+        }else{
+          y=hybridTextRightWrap(pdf,ta.value,rightX,y,contentW,5);
+        }
+        y+=2;
+      });
+    }
+    y+=2;
 
     // ── ④ NOTES ──
     var notes=document.getElementById('notes').value;
@@ -2969,7 +3025,7 @@ async function saveHybridPDF(){
       drawSectionHeader('④ '+t('sec4'));
       pdf.setFont('DejaVu','normal');pdf.setFontSize(10);
       y=hybridTextRightWrap(pdf,notes,rightX,y,contentW,5);
-      y+=5;
+      y+=3;
     }
 
     // ── ⑤ ITEMS TABLE ──
@@ -2981,7 +3037,7 @@ async function saveHybridPDF(){
     });
     if(hasItems){
       drawSectionHeader('⑤ '+t('sec5'));
-      y=hybridCheckNeeded(pdf,y,20,pdfH,margin);
+      y=hybridCheckNeeded(pdf,y,20,pdfH,margin,marginBottom);
 
       // Table header
       var colW=[contentW*0.15,contentW*0.35,contentW*0.5];
@@ -2995,13 +3051,13 @@ async function saveHybridPDF(){
       pdf.text(bidiReorder(t('sku')),colX[1]+colW[1]/2,y+5.5,{align:'center'});
       pdf.text(bidiReorder(t('item')),colX[2]+colW[2]/2,y+5.5,{align:'center'});
       pdf.setTextColor(0);
-      y+=8;
+      y+=6;
 
       // Table rows
       itemRows.forEach(function(tr){
         var inputs=tr.querySelectorAll('input');
         if(!inputs[0]||!inputs[0].value) return;
-        y=hybridCheckNeeded(pdf,y,10,pdfH,margin);
+        y=hybridCheckNeeded(pdf,y,10,pdfH,margin,marginBottom);
         pdf.setDrawColor(220);
         pdf.line(margin,y+8,rightX,y+8);
         pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
@@ -3009,26 +3065,71 @@ async function saveHybridPDF(){
         pdf.text(inputs[1]?inputs[1].value:'',colX[1]+colW[1]/2,y+5.5,{align:'center'});
         var itemVal=inputs[0]?inputs[0].value:'';
         pdf.text(bidiReorder(itemVal),colX[2]+colW[2]-2,y+5.5,{align:'right'});
-        y+=8;
+        y+=6;
       });
-      y+=5;
+      y+=4;
     }
 
-    // ── 📷 PHOTOS ──
+    // ── SIGNATURES (compact inline) ──
+    y+=3; // gap after items
+    y=hybridCheckNeeded(pdf,y,25,pdfH,margin,marginBottom);
+
+    // Helper: get signature with white background as JPEG
+    function getSigPNG(canvas){
+      var tc=document.createElement('canvas');
+      tc.width=canvas.width;tc.height=canvas.height;
+      var tctx=tc.getContext('2d');
+      tctx.fillStyle='#FFFFFF';
+      tctx.fillRect(0,0,tc.width,tc.height);
+      tctx.drawImage(canvas,0,0);
+      return tc.toDataURL('image/jpeg',0.6);
+    }
+
+    var sigW=contentW/2-5;
+    var sigH=18; // compact height
+    var sigTechCanvas=document.getElementById('sigTechCanvas');
+    var sigClientCanvas=document.getElementById('sigClientCanvas');
+
+    // Labels
+    pdf.setFont('DejaVu','bold');pdf.setFontSize(8);
+    hybridTextRight(pdf,t('sigTech'),rightX,y+2,sigW);
+    hybridTextRight(pdf,t('sigClient'),rightX-sigW-10,y+2,sigW);
+    y+=5;
+
+    // Signature images (inline, no box)
+    try{
+      if(sigTechCanvas.width>0){
+        pdf.addImage(getSigPNG(sigTechCanvas),'JPEG',rightX-sigW,y,sigW,sigH);
+      }
+    }catch(e){}
+    try{
+      if(sigClientCanvas.width>0){
+        pdf.addImage(getSigPNG(sigClientCanvas),'JPEG',margin,y,sigW,sigH);
+      }
+    }catch(e){}
+    y+=sigH+1;
+
+    // Lines under signatures
+    pdf.setDrawColor(150);
+    pdf.setLineWidth(0.3);
+    pdf.line(rightX-sigW,y,rightX,y);
+    pdf.line(margin,y,margin+sigW,y);
+    y+=3;
+
+    // ── 📷 PHOTOS (last section) ──
     if(reportPhotos.length>0){
       drawSectionHeader('📷 '+t('secPhotos'));
-      var photoW=isLandscape?40:55;
-      var photoH=isLandscape?30:42;
+      var photoW=isLandscape?35:45;
+      var photoH=isLandscape?25:34;
       var photosPerRow=Math.floor(contentW/(photoW+4));
       var photoX=rightX-photoW;
       var photoCount=0;
 
       for(var pi=0;pi<reportPhotos.length;pi++){
-        y=hybridCheckNeeded(pdf,y,photoH+12,pdfH,margin);
+        y=hybridCheckNeeded(pdf,y,photoH+12,pdfH,margin,marginBottom);
         try{
           var imgData=reportPhotos[pi].full||reportPhotos[pi].thumb;
           pdf.addImage(imgData,'JPEG',photoX,y,photoW,photoH);
-          // Photo name
           if(reportPhotos[pi].name){
             pdf.setFont('DejaVu','normal');pdf.setFontSize(7);
             var pname=bidiReorder(reportPhotos[pi].name);
@@ -3039,122 +3140,10 @@ async function saveHybridPDF(){
         photoX-=(photoW+4);
         if(photoCount%photosPerRow===0){
           photoX=rightX-photoW;
-          y+=photoH+10;
+          y+=photoH+6;
         }
       }
-      if(photoCount%photosPerRow!==0) y+=photoH+10;
-    }
-
-    // ── ⑥ EXECUTION SUMMARY ──
-    drawSectionHeader('⑥ '+t('sec6'));
-    if(isLandscape){
-      var yStart2=y;
-      y=hybridDrawField(pdf,t('techName'),document.getElementById('techName').value,rightX,y,halfW,fieldH);
-      y=hybridDrawField(pdf,t('startTime'),document.getElementById('startTime').value,rightX,y,halfW,fieldH);
-      var y6a=y;
-      y=yStart2;
-      var col2=rightX-halfW-10;
-      y=hybridDrawField(pdf,t('travelHours'),document.getElementById('travelHours').value,col2,y,halfW,fieldH);
-      y=hybridDrawField(pdf,t('endTime'),document.getElementById('endTime').value,col2,y,halfW,fieldH);
-      y=Math.max(y6a,y);
-
-      // Work hours
-      var whDisplay=document.getElementById('workHoursDisplay');
-      if(whDisplay&&whDisplay.style.display!=='none'){
-        y=hybridCheckNeeded(pdf,y,8,pdfH,margin);
-        pdf.setFont('DejaVu','bold');pdf.setFontSize(10);
-        pdf.setTextColor(180,28,28);
-        hybridTextRight(pdf,whDisplay.textContent,rightX,y,contentW);
-        pdf.setTextColor(0);
-        y+=7;
-      }
-      y=hybridDrawField(pdf,t('travelKm'),document.getElementById('travelKm').value,rightX,y,halfW,fieldH);
-    }else{
-      y=hybridDrawField(pdf,t('techName'),document.getElementById('techName').value,rightX,y,contentW,fieldH);
-      y=hybridDrawField(pdf,t('travelHours'),document.getElementById('travelHours').value,rightX,y,contentW,fieldH);
-      y=hybridDrawField(pdf,t('startTime'),document.getElementById('startTime').value,rightX,y,contentW,fieldH);
-      y=hybridDrawField(pdf,t('endTime'),document.getElementById('endTime').value,rightX,y,contentW,fieldH);
-
-      var whDisplay=document.getElementById('workHoursDisplay');
-      if(whDisplay&&whDisplay.style.display!=='none'){
-        y=hybridCheckNeeded(pdf,y,8,pdfH,margin);
-        pdf.setFont('DejaVu','bold');pdf.setFontSize(10);
-        pdf.setTextColor(180,28,28);
-        hybridTextRight(pdf,whDisplay.textContent,rightX,y,contentW);
-        pdf.setTextColor(0);
-        y+=7;
-      }
-      y=hybridDrawField(pdf,t('travelKm'),document.getElementById('travelKm').value,rightX,y,contentW,fieldH);
-    }
-
-    // ── SIGNATURES ──
-    y=hybridCheckNeeded(pdf,y,60,pdfH,margin);
-    pdf.setFont('DejaVu','bold');pdf.setFontSize(12);
-    pdf.setTextColor(180,28,28);
-    hybridTextRight(pdf,t('signatures'),rightX,y+4,contentW);
-    y+=7;
-    pdf.setDrawColor(180,28,28);pdf.setLineWidth(0.5);
-    pdf.line(margin,y,rightX,y);
-    pdf.setLineWidth(0.3);pdf.setTextColor(0);
-    y+=6;
-
-    var sigW=isLandscape?(contentW/2-5):contentW;
-    var sigH=isLandscape?35:40;
-
-    // Tech signature
-    var sigTechCanvas=document.getElementById('sigTechCanvas');
-    pdf.setFont('DejaVu','bold');pdf.setFontSize(9);
-    if(isLandscape){
-      hybridTextRight(pdf,t('sigTech'),rightX,y,sigW);
-      hybridTextRight(pdf,t('sigClient'),rightX-sigW-10,y,sigW);
-      y+=4;
-      pdf.setDrawColor(180);
-      pdf.setLineDashPattern([2,2]);
-      pdf.roundedRect(rightX-sigW,y,sigW,sigH,2,2,'S');
-      pdf.roundedRect(margin,y,sigW,sigH,2,2,'S');
-      pdf.setLineDashPattern([]);
-      try{
-        if(sigTechCanvas.width>0){
-          pdf.addImage(sigTechCanvas.toDataURL('image/png'),'PNG',rightX-sigW+2,y+2,sigW-4,sigH-4);
-        }
-      }catch(e){}
-      var sigClientCanvas=document.getElementById('sigClientCanvas');
-      try{
-        if(sigClientCanvas.width>0){
-          pdf.addImage(sigClientCanvas.toDataURL('image/png'),'PNG',margin+2,y+2,sigW-4,sigH-4);
-        }
-      }catch(e){}
-      y+=sigH+5;
-    }else{
-      hybridTextRight(pdf,t('sigTech'),rightX,y,contentW);
-      y+=4;
-      pdf.setDrawColor(180);
-      pdf.setLineDashPattern([2,2]);
-      pdf.roundedRect(margin,y,contentW,sigH,2,2,'S');
-      pdf.setLineDashPattern([]);
-      try{
-        if(sigTechCanvas.width>0){
-          pdf.addImage(sigTechCanvas.toDataURL('image/png'),'PNG',margin+2,y+2,contentW-4,sigH-4);
-        }
-      }catch(e){}
-      y+=sigH+8;
-
-      // Client signature
-      y=hybridCheckNeeded(pdf,y,sigH+15,pdfH,margin);
-      pdf.setFont('DejaVu','bold');pdf.setFontSize(9);
-      hybridTextRight(pdf,t('sigClient'),rightX,y,contentW);
-      y+=4;
-      pdf.setDrawColor(180);
-      pdf.setLineDashPattern([2,2]);
-      pdf.roundedRect(margin,y,contentW,sigH,2,2,'S');
-      pdf.setLineDashPattern([]);
-      var sigClientCanvas=document.getElementById('sigClientCanvas');
-      try{
-        if(sigClientCanvas.width>0){
-          pdf.addImage(sigClientCanvas.toDataURL('image/png'),'PNG',margin+2,y+2,contentW-4,sigH-4);
-        }
-      }catch(e){}
-      y+=sigH+5;
+      if(photoCount%photosPerRow!==0) y+=photoH+6;
     }
 
     // ── SAVE FILE ──
@@ -3175,8 +3164,23 @@ async function saveHybridPDF(){
       var savedName=await saveFileWithPicker(pdfBlob,fn,'spectro-pdf');
       if(savedName) showToast(t('pdfOk')+savedName);
       var jsonBlob=new Blob([lastSavedJsonStr],{type:'application/json'});
-      var savedJson=await saveFileWithPicker(jsonBlob,lastSavedJsonName,'spectro-json');
-      if(savedJson) showToast(t('jsonSaved')+savedJson);
+      var doJson=await new Promise(function(resolve){
+        var d=document.createElement('div');
+        d.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99999;display:flex;align-items:center;justify-content:center';
+        d.innerHTML='<div style="background:#fff;border-radius:12px;padding:24px;max-width:320px;text-align:center;font-family:Rubik,sans-serif">'
+          +'<div style="font-size:15px;margin-bottom:16px;color:#334155">'+(lang==='he'?'PDF נשמר בהצלחה ✅<br>לשמור גם קובץ JSON לגיבוי?':'PDF saved ✅<br>Save JSON backup file too?')+'</div>'
+          +'<div style="display:flex;gap:10px;justify-content:center">'
+          +'<button id="jsonYes2" style="background:#10B981;color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:14px;cursor:pointer;font-family:Rubik,sans-serif">'+(lang==='he'?'💾 שמור JSON':'💾 Save JSON')+'</button>'
+          +'<button id="jsonNo2" style="background:#E5E7EB;color:#334155;border:none;padding:8px 20px;border-radius:8px;font-size:14px;cursor:pointer;font-family:Rubik,sans-serif">'+(lang==='he'?'דלג':'Skip')+'</button>'
+          +'</div></div>';
+        document.body.appendChild(d);
+        d.querySelector('#jsonYes2').onclick=function(){document.body.removeChild(d);resolve(true)};
+        d.querySelector('#jsonNo2').onclick=function(){document.body.removeChild(d);resolve(false)};
+      });
+      if(doJson){
+        var savedJson=await saveFileWithPicker(jsonBlob,lastSavedJsonName,'spectro-json');
+        if(savedJson) showToast(t('jsonSaved')+savedJson);
+      }
     }else{
       if(saveDirHandle){
         try{
