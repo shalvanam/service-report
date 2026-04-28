@@ -2849,19 +2849,19 @@ async function saveHybridPDF(){
     var num=document.getElementById('reportNum').value||'';
     pdf.setDrawColor(180,28,28);
     pdf.setLineWidth(1.5);
-    pdf.roundedRect(margin,y,50,14,3,3,'S');
+    pdf.roundedRect(margin,y,50,18,3,3,'S');
     pdf.setFont('DejaVu','bold');
-    pdf.setFontSize(16);
+    pdf.setFontSize(18);
     pdf.setTextColor(180,28,28);
-    pdf.text(num,margin+25,y+10,{align:'center'});
+    pdf.text(num,margin+25,y+12,{align:'center'});
     // Title label to the right of counter box
-    pdf.setFontSize(10);
+    pdf.setFontSize(11);
     var title=bidiReorder(lang==='he'?'דוח שירות מס\':':'Service Report No:');
-    pdf.text(title,margin+55,y+10);
+    pdf.text(title,margin+55,y+12);
     pdf.setTextColor(0);
     pdf.setLineWidth(0.3);
 
-    y+=15;
+    y+=18;
 
     // Red separator line
     pdf.setDrawColor(180,28,28);
