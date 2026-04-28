@@ -195,8 +195,8 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
 .rnum .rt{display:flex;align-items:center;gap:12px}
 .rnum .rt img{height:40px}
 .rnum label{font-size:15px;font-weight:700;color:var(--s7)}
-.cbox{background:var(--s0);border:2px solid var(--red);border-radius:6px;padding:6px 18px;min-width:100px;text-align:center;position:relative}
-.cbox input{font-size:20px;font-weight:800;color:var(--red);border:none;background:transparent;text-align:center;width:100%;font-family:'Rubik';outline:none}
+.cbox{background:var(--s0);border:2px solid var(--red);border-radius:6px;padding:3px 18px;min-width:100px;text-align:center;position:relative}
+.cbox input{font-size:16px;font-weight:800;color:var(--red);border:none;background:transparent;text-align:center;width:100%;font-family:'Rubik';outline:none}
 .cbox .ld{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--s0);border-radius:4px;font-size:11px;color:var(--s5)}
 
 .cd{background:var(--w);box-shadow:0 1px 2px rgba(0,0,0,.04);padding:16px 20px;border-bottom:1px solid var(--s2)}
@@ -436,9 +436,8 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
       <span id="syncText">מחכה לחיבור</span>
     </div>
     <button class="btn btn-cl" onclick="confirmClearForm()">🗑 <span data-t="clearForm">נקה טופס</span></button>
-    <button class="btn btn-pr" onclick="window.print()">🖨 <span data-t="print">הדפסה</span></button>
-    <button class="btn btn-save" onclick="savePDF()">💾 <span data-t="saveImage">שמור תמונה</span></button>
-    <button class="btn" onclick="saveHybridPDF()" style="background:#2563EB;color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3)">📝 <span data-t="savePdf">שמור PDF</span></button>
+    <button class="btn btn-pr" onclick="printPDF()">🖨 <span data-t="print">הדפסה</span></button>
+    <button class="btn btn-save" onclick="saveHybridPDF()">💾 <span data-t="savePdf">שמור PDF</span></button>
     <button class="btn btn-cam" onclick="takePhoto()">📷 <span data-t="camera">צלם</span></button>
     <button class="btn btn-send" onclick="sendFiles()">📤 <span data-t="send">שלח</span></button>
     <button class="btn btn-new" id="btnNew" onclick="confirmNewReport()" disabled>+ <span data-t="newReport">דוח חדש</span></button>
@@ -1111,6 +1110,34 @@ async function saveJsonFile(fileName){
     }
   }else{
     downloadBlob(new Blob([jsonStr],{type:'application/json'}),jsonName);
+  }
+}
+
+function printPDF(){
+  if(lastSavedPdfBlob){
+    // On mobile: use share with print intent, or download and let user print
+    // On desktop: open in iframe and trigger print
+    var url=URL.createObjectURL(lastSavedPdfBlob);
+    if(/Android|iPhone|iPad/i.test(navigator.userAgent)&&navigator.share){
+      // Mobile: use share to let user pick Print
+      var file=new File([lastSavedPdfBlob],lastSavedPdfName||'report.pdf',{type:'application/pdf'});
+      navigator.share({files:[file],title:lastSavedPdfName||'report.pdf'}).catch(function(){
+        // Fallback: open in new tab
+        window.open(url,'_blank');
+      });
+    }else{
+      // Desktop: iframe print
+      var iframe=document.createElement('iframe');
+      iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+      iframe.src=url;
+      document.body.appendChild(iframe);
+      iframe.onload=function(){
+        try{iframe.contentWindow.print()}catch(e){window.open(url,'_blank')}
+        setTimeout(function(){try{document.body.removeChild(iframe)}catch(e){}URL.revokeObjectURL(url)},120000);
+      };
+    }
+  }else{
+    showToast(lang==='he'?'יש לשמור PDF תחילה — לחץ על כפתור שמור PDF':'Save a PDF first — press the Save PDF button');
   }
 }
 
@@ -2848,20 +2875,20 @@ async function saveHybridPDF(){
     // Counter box (left side, smaller)
     var num=document.getElementById('reportNum').value||'';
     pdf.setDrawColor(180,28,28);
-    pdf.setLineWidth(1.5);
-    pdf.roundedRect(margin,y,50,18,3,3,'S');
+    pdf.setLineWidth(0.5);
+    pdf.roundedRect(margin,y,50,10,3,3,'S');
     pdf.setFont('DejaVu','bold');
-    pdf.setFontSize(18);
+    pdf.setFontSize(14);
     pdf.setTextColor(180,28,28);
-    pdf.text(num,margin+25,y+12,{align:'center'});
+    pdf.text(num,margin+25,y+7.5,{align:'center'});
     // Title label to the right of counter box
-    pdf.setFontSize(11);
+    pdf.setFontSize(10);
     var title=bidiReorder(lang==='he'?'דוח שירות מס\':':'Service Report No:');
-    pdf.text(title,margin+55,y+12);
+    pdf.text(title,margin+55,y+7.5);
     pdf.setTextColor(0);
     pdf.setLineWidth(0.3);
 
-    y+=18;
+    y+=13;
 
     // Red separator line
     pdf.setDrawColor(180,28,28);
@@ -3081,7 +3108,7 @@ async function saveHybridPDF(){
 
     // ── SIGNATURES (compact inline) ──
     y+=3; // gap after items
-    y=hybridCheckNeeded(pdf,y,25,pdfH,margin,marginBottom);
+    y=hybridCheckNeeded(pdf,y,16,pdfH,margin,marginBottom);
 
     // Helper: get signature with white background as JPEG
     function getSigPNG(canvas){
@@ -3094,42 +3121,45 @@ async function saveHybridPDF(){
       return tc.toDataURL('image/jpeg',0.6);
     }
 
-    var sigW=contentW/2-5;
-    var sigH=18; // compact height
+    var sigH=12;
+    var sigLabelW=35; // width for label text
+    var sigImgW=(contentW-sigLabelW*2-10)/2; // remaining width for signature images
     var sigTechCanvas=document.getElementById('sigTechCanvas');
     var sigClientCanvas=document.getElementById('sigClientCanvas');
 
-    // Labels
-    pdf.setFont('DejaVu','bold');pdf.setFontSize(8);
-    hybridTextRight(pdf,t('sigTech'),rightX,y+2,sigW);
-    hybridTextRight(pdf,t('sigClient'),rightX-sigW-10,y+2,sigW);
-    y+=5;
-
-    // Signature images (inline, no box)
+    // Tech signature: label on right, image to its left
+    pdf.setFont('DejaVu','bold');pdf.setFontSize(7);
+    hybridTextRight(pdf,t('sigTech'),rightX,y+sigH/2,sigLabelW);
     try{
       if(sigTechCanvas.width>0){
-        pdf.addImage(getSigPNG(sigTechCanvas),'JPEG',rightX-sigW,y,sigW,sigH);
+        pdf.addImage(getSigPNG(sigTechCanvas),'JPEG',rightX-sigLabelW-sigImgW,y,sigImgW,sigH);
       }
     }catch(e){}
+
+    // Client signature: label on right of left half, image to its left
+    var clientLabelX=rightX-sigLabelW-sigImgW-10;
+    hybridTextRight(pdf,t('sigClient'),clientLabelX,y+sigH/2,sigLabelW);
     try{
       if(sigClientCanvas.width>0){
-        pdf.addImage(getSigPNG(sigClientCanvas),'JPEG',margin,y,sigW,sigH);
+        pdf.addImage(getSigPNG(sigClientCanvas),'JPEG',clientLabelX-sigLabelW-sigImgW,y,sigImgW,sigH);
       }
     }catch(e){}
-    y+=sigH+1;
 
     // Lines under signatures
+    y+=sigH+1;
     pdf.setDrawColor(150);
     pdf.setLineWidth(0.3);
-    pdf.line(rightX-sigW,y,rightX,y);
-    pdf.line(margin,y,margin+sigW,y);
+    pdf.line(rightX-sigLabelW-sigImgW,y,rightX,y);
+    pdf.line(clientLabelX-sigLabelW-sigImgW,y,clientLabelX,y);
     y+=3;
 
     // ── 📷 PHOTOS (last section) ──
     if(reportPhotos.length>0){
-      drawSectionHeader('📷 '+t('secPhotos'));
       var photoW=isLandscape?35:45;
       var photoH=isLandscape?25:34;
+      // Check if header + first photo fit on current page together
+      y=hybridCheckNeeded(pdf,y,photoH+20,pdfH,margin,marginBottom);
+      drawSectionHeader('📷 '+t('secPhotos'));
       var photosPerRow=Math.floor(contentW/(photoW+4));
       var photoX=rightX-photoW;
       var photoCount=0;
