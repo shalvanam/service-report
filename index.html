@@ -576,6 +576,7 @@ body{font-family:'Rubik',sans-serif;background:var(--s1);color:var(--s9);font-si
     <div class="work-hours" id="workHoursDisplay" style="display:none"></div>
     <div class="fr s1">
       <div class="fg"><label data-t="travelKm">ק״מ נסיעה</label><input type="text" id="travelKm"></div>
+      <div class="fg"><label data-t="invoiceNum">מס' חשבונית חיוב</label><input type="text" id="invoiceNum"></div>
     </div>
   </div>
 
@@ -638,7 +639,7 @@ var T = {
     serialNum:'מס׳ סידורי',sec3:'③ תיאור העבודה',workSubject:'סיבת ביקור:',workActions:'פעולות שבוצעו:',addRow:'+ הוסף שורה',
     sec4:'④ הערות והמלצות',sec5:'⑤ פריטים',item:'פריט',sku:'מק״ט',qty:'כמות',
     addItem:'+ הוסף פריט',sec6:'⑥ סיכום ביצוע',techName:'שם מבצע השירות',startTime:'שעת התחלה',
-    endTime:'שעת סיום',travelHours:'שעות נסיעה',travelKm:'ק״מ נסיעה',signatures:'חתימות',
+    endTime:'שעת סיום',travelHours:'שעות נסיעה',travelKm:'ק״מ נסיעה',invoiceNum:"מס' חשבונית חיוב",signatures:'חתימות',
     sigTech:'חתימת מבצע השירות',sigClient:'חתימת לקוח',clickSign:'לחץ וחתום',clear:'נקה',
     connect:'חבר',disconnect:'נתק',connected:'מחובר',connecting:'מתחבר...',
     creating:'יוצר דוח...',connError:'שגיאת חיבור',formCleared:'🗑 הטופס נוקה',
@@ -672,7 +673,7 @@ var T = {
     serialNum:'Serial #',sec3:'③ Work Description',workSubject:'Visit Reason:',workActions:'Actions Performed:',addRow:'+ Add Row',
     sec4:'④ Notes & Recommendations',sec5:'⑤ Items',item:'Item',sku:'SKU',qty:'Qty',
     addItem:'+ Add Item',sec6:'⑥ Execution Summary',techName:'Service Technician',startTime:'Start Time',
-    endTime:'End Time',travelHours:'Travel Hours',travelKm:'Travel Km',signatures:'Signatures',
+    endTime:'End Time',travelHours:'Travel Hours',travelKm:'Travel Km',invoiceNum:'Invoice #',signatures:'Signatures',
     sigTech:'Technician Signature',sigClient:'Client Signature',clickSign:'Click to sign',clear:'Clear',
     connect:'Connect',disconnect:'Disconnect',connected:'Connected',connecting:'Connecting...',
     creating:'Creating...',connError:'Connection Error',formCleared:'🗑 Form cleared',
@@ -1061,7 +1062,7 @@ async function saveFileWithPicker(blob,suggestedName,pickerId){
 function collectFormData(){
   var data={};
   var fields=['factoryName','contactName','reportDate','deviceType','manufacturer','serialNum',
-    'workSubject','notes','techName','startTime','endTime','travelHours','travelKm','reportNum'];
+    'workSubject','notes','techName','startTime','endTime','travelHours','travelKm','invoiceNum','reportNum'];
   fields.forEach(function(id){
     var el=document.getElementById(id);
     if(el) data[id]=el.value;
@@ -1182,7 +1183,7 @@ async function loadJsonReport(){
 function applyFormData(data){
   // Simple fields
   var fields=['factoryName','contactName','reportDate','deviceType','manufacturer','serialNum',
-    'workSubject','notes','techName','startTime','endTime','travelHours','travelKm','reportNum'];
+    'workSubject','notes','techName','startTime','endTime','travelHours','travelKm','invoiceNum','reportNum'];
   fields.forEach(function(id){
     var el=document.getElementById(id);
     if(el&&data[id]!==undefined) el.value=data[id];
@@ -2125,7 +2126,7 @@ function saveFormData(){
     var data={};
     // Simple fields
     var fields=['factoryName','contactName','reportDate','deviceType','manufacturer','serialNum',
-      'workSubject','notes','techName','startTime','endTime','travelHours','travelKm','reportNum'];
+      'workSubject','notes','techName','startTime','endTime','travelHours','travelKm','invoiceNum','reportNum'];
     fields.forEach(function(id){
       var el=document.getElementById(id);
       if(el) data[id]=el.value;
@@ -2168,7 +2169,7 @@ function restoreFormData(){
     var data=JSON.parse(raw);
     // Simple fields
     var fields=['factoryName','contactName','reportDate','deviceType','manufacturer','serialNum',
-      'workSubject','notes','techName','startTime','endTime','travelHours','travelKm','reportNum'];
+      'workSubject','notes','techName','startTime','endTime','travelHours','travelKm','invoiceNum','reportNum'];
     fields.forEach(function(id){
       var el=document.getElementById(id);
       if(el&&data[id]!==undefined) el.value=data[id];
@@ -2826,8 +2827,8 @@ async function saveHybridPDF(){
     var pdf=new jsPDF(orient,'mm','a4');
     var pdfW=isLandscape?297:210;
     var pdfH=isLandscape?210:297;
-    var margin=10;
-    var marginBottom=15; // extra bottom margin for printer safety
+    var margin=7;
+    var marginBottom=12; // bottom margin for printer safety
     var contentW=pdfW-margin*2;
     var rightX=pdfW-margin;
     var y=margin;
@@ -2839,28 +2840,28 @@ async function saveHybridPDF(){
     pdf.addFont('DejaVu-bold.ttf','DejaVu','bold');
 
     // ── HEADER ──
-    // Logo
+    // Logo (smaller)
     var logoImg=document.querySelector('.rnum .rt img');
     if(logoImg){
-      try{pdf.addImage(logoImg.src,'JPEG',rightX-45,y,45,18)}catch(e){}
+      try{pdf.addImage(logoImg.src,'JPEG',rightX-38,y,38,15)}catch(e){}
     }
-    // Counter box (left side)
+    // Counter box (left side, smaller)
     var num=document.getElementById('reportNum').value||'';
     pdf.setDrawColor(180,28,28);
     pdf.setLineWidth(1.5);
-    pdf.roundedRect(margin,y,55,22,3,3,'S');
+    pdf.roundedRect(margin,y,50,14,3,3,'S');
     pdf.setFont('DejaVu','bold');
-    pdf.setFontSize(20);
+    pdf.setFontSize(16);
     pdf.setTextColor(180,28,28);
-    pdf.text(num,margin+27.5,y+14,{align:'center'});
+    pdf.text(num,margin+25,y+10,{align:'center'});
     // Title label to the right of counter box
-    pdf.setFontSize(12);
+    pdf.setFontSize(10);
     var title=bidiReorder(lang==='he'?'דוח שירות מס\':':'Service Report No:');
-    pdf.text(title,margin+60,y+14);
+    pdf.text(title,margin+55,y+10);
     pdf.setTextColor(0);
     pdf.setLineWidth(0.3);
 
-    y+=22;
+    y+=15;
 
     // Red separator line
     pdf.setDrawColor(180,28,28);
@@ -2882,7 +2883,7 @@ async function saveHybridPDF(){
     pdf.text(infoRight,rightX-pdf.getTextWidth(infoRight),y+3);
     pdf.text(infoLeft,margin,y+3);
     pdf.setTextColor(0);
-    y+=7;
+    y+=5;
 
     var fieldH=10;
     var halfW=isLandscape?(contentW/2-5):(contentW);
@@ -2905,7 +2906,7 @@ async function saveHybridPDF(){
     // ── ① GENERAL DETAILS + ② DEVICE DETAILS ──
     drawSectionHeader('① '+t('sec1')+' / '+'② '+t('sec2'));
 
-    // 4-field grid layout for both orientations
+    // 4-field grid
     var qW=(contentW-12)/4; // 4 columns with 4mm gaps
     function drawGridField(label,value,col,rowY){
       var gx=rightX-col*(qW+4);
@@ -2917,66 +2918,74 @@ async function saveHybridPDF(){
       if(value) hybridTextRight(pdf,value,gx-3,rowY+fieldH-3,qW-6);
     }
 
-    // Row 1: Factory | Contact | Date | Call Type
+    // Row 1: Technician | Factory | Contact | Date
     var rowY=y;
-    drawGridField(t('factoryName'),document.getElementById('factoryName').value,0,rowY);
-    drawGridField(t('contactName'),document.getElementById('contactName').value,1,rowY);
-    drawGridField(t('date'),document.getElementById('reportDate').value,2,rowY);
+    drawGridField(t('techName'),document.getElementById('techName').value,0,rowY);
+    drawGridField(t('factoryName'),document.getElementById('factoryName').value,1,rowY);
+    drawGridField(t('contactName'),document.getElementById('contactName').value,2,rowY);
+    drawGridField(t('date'),document.getElementById('reportDate').value,3,rowY);
+    y=rowY+fieldH+8;
 
-    // Call type in 4th column - checkboxes as text
-    var ctLabel=t('callType');
+    // Row 2: Call Type | Device Type | Manufacturer | Serial
+    rowY=y;
     var ctVal='';
     var checks=document.querySelectorAll('input[name="callType"]');
     checks.forEach(function(cb){
       if(cb.checked) ctVal+=(ctVal?', ':'')+cb.parentElement.querySelector('span').textContent;
     });
-    drawGridField(ctLabel,ctVal||'-',3,rowY);
-    y=rowY+fieldH+8;
-
-    // Row 2: Device Type | Manufacturer | Serial | (empty)
-    rowY=y;
-    drawGridField(t('deviceType'),document.getElementById('deviceType').value,0,rowY);
-    drawGridField(t('manufacturer'),document.getElementById('manufacturer').value,1,rowY);
-    drawGridField(t('serialNum'),document.getElementById('serialNum').value,2,rowY);
+    drawGridField(t('callType'),ctVal||'-',0,rowY);
+    drawGridField(t('deviceType'),document.getElementById('deviceType').value,1,rowY);
+    drawGridField(t('manufacturer'),document.getElementById('manufacturer').value,2,rowY);
+    drawGridField(t('serialNum'),document.getElementById('serialNum').value,3,rowY);
     y=rowY+fieldH+5;
 
     // ── ⑥ EXECUTION SUMMARY ──
     drawSectionHeader('⑥ '+t('sec6'));
-    // Single row: Name (wider) | Travel Hours | Start | End | Total Hours | Travel Km
-    var nameW=contentW*0.25;
-    var smallW=(contentW-nameW-20)/5; // 5 small fields + 4mm gaps each
+    // Variable widths: 4 small fields (50%) + total hours (normal) + invoice (wider)
+    var smallExW=(contentW*0.4)/4-3; // 4 small fields share 40% of width
+    var whW=contentW*0.2;            // total hours gets 20%
+    var invW=contentW*0.4-8;         // invoice gets remaining 40%
     rowY=y;
-    // Field 1: Technician name (wider)
-    var gx=rightX;
-    pdf.setFont('DejaVu','bold');pdf.setFontSize(8);
-    hybridTextRight(pdf,t('techName'),gx,rowY-2,nameW);
-    pdf.setDrawColor(200);pdf.setFillColor(250,250,252);
-    pdf.roundedRect(gx-nameW,rowY+1,nameW,fieldH,2,2,'FD');
-    pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
-    var tnVal=document.getElementById('techName').value||'';
-    if(tnVal) hybridTextRight(pdf,tnVal,gx-3,rowY+fieldH-3,nameW-6);
 
-    // Fields 2-6: small equal columns
-    function drawSmallField(label,value,idx){
-      var sx=rightX-nameW-4-idx*(smallW+4);
+    function drawExecSmall(label,value,xPos){
       pdf.setFont('DejaVu','bold');pdf.setFontSize(7);
-      hybridTextRight(pdf,label,sx,rowY-2,smallW);
+      hybridTextRight(pdf,label,xPos,rowY-2,smallExW);
       pdf.setDrawColor(200);pdf.setFillColor(250,250,252);
-      pdf.roundedRect(sx-smallW,rowY+1,smallW,fieldH,2,2,'FD');
+      pdf.roundedRect(xPos-smallExW,rowY+1,smallExW,fieldH,2,2,'FD');
       pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
-      if(value) hybridTextRight(pdf,value,sx-2,rowY+fieldH-3,smallW-4);
+      if(value) hybridTextRight(pdf,value,xPos-2,rowY+fieldH-3,smallExW-4);
     }
-    drawSmallField(t('travelHours'),document.getElementById('travelHours').value,0);
-    drawSmallField(t('startTime'),document.getElementById('startTime').value,1);
-    drawSmallField(t('endTime'),document.getElementById('endTime').value,2);
-    // Total work hours
+    function drawExecWide(label,value,xPos,w){
+      pdf.setFont('DejaVu','bold');pdf.setFontSize(7);
+      hybridTextRight(pdf,label,xPos,rowY-2,w);
+      pdf.setDrawColor(200);pdf.setFillColor(250,250,252);
+      pdf.roundedRect(xPos-w,rowY+1,w,fieldH,2,2,'FD');
+      pdf.setFont('DejaVu','normal');pdf.setFontSize(9);
+      if(value) hybridTextRight(pdf,value,xPos-2,rowY+fieldH-3,w-4);
+    }
+
+    // 4 small fields from right
+    var sx=rightX;
+    drawExecSmall(t('travelHours'),document.getElementById('travelHours').value,sx);
+    sx-=smallExW+4;
+    drawExecSmall(t('startTime'),document.getElementById('startTime').value,sx);
+    sx-=smallExW+4;
+    drawExecSmall(t('endTime'),document.getElementById('endTime').value,sx);
+    sx-=smallExW+4;
+    drawExecSmall(t('travelKm'),document.getElementById('travelKm').value,sx);
+    sx-=smallExW+4;
+
+    // Total work hours (medium)
     var whDisplay=document.getElementById('workHoursDisplay');
     var whVal='';
     if(whDisplay&&whDisplay.style.display!=='none'){
       whVal=whDisplay.textContent.replace(/⏱\s*/,'').replace(/סה.כ שעות עבודה:\s*/,'').replace(/Total work hours:\s*/,'').trim();
     }
-    drawSmallField(t('workHours')||'סה״כ שעות',whVal,3);
-    drawSmallField(t('travelKm'),document.getElementById('travelKm').value,4);
+    drawExecWide(t('workHours')||'סה״כ שעות',whVal,sx,whW);
+    sx-=whW+4;
+
+    // Invoice number (widest, fills remaining)
+    drawExecWide(t('invoiceNum'),document.getElementById('invoiceNum').value,sx,invW);
     y=rowY+fieldH+5;
 
     // ── ③ WORK DESCRIPTION ──
